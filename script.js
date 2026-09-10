@@ -24,21 +24,12 @@ function updateClock() {
   const date = document.getElementById('date');
   if (date && !date.value) date.value = localDateString(now);
 
-  document.querySelectorAll('[data-time]').forEach(el => {
-    el.textContent = time;
-  });
-
+  document.querySelectorAll('[data-time]').forEach(el => { el.textContent = time; });
   updateFlightStatuses(now);
 }
 
 function updateFlightStatuses(now = new Date()) {
-  const flights = {
-    'LP 404': '09:00',
-    'LP 007': '11:30',
-    'LP 314': '14:20',
-    'LP 9001': '23:59'
-  };
-
+  const flights = { 'LP 404': '09:00', 'LP 007': '11:30', 'LP 314': '14:20', 'LP 9001': '23:59' };
   document.querySelectorAll('.route-grid article').forEach(card => {
     const code = card.querySelector('b')?.textContent.trim();
     if (!flights[code]) return;
@@ -75,101 +66,90 @@ function showNotice() {
 
 function bookNow() {
   if (document.getElementById('flights')) scrollToFlights();
+  else if (location.pathname.endsWith('booking.html')) searchFlight();
   else window.location.href = 'booking.html';
 }
 
 function searchFlight() {
-  const from = document.getElementById('from')?.value || 'somewhere';
-  const to = document.getElementById('to')?.value || 'somewhere nice';
-  const result = document.getElementById('result');
-  if (!result) return;
-  result.classList.remove('hidden');
+  const from = document.getElementById('from')?.value || 'Lupin International';
+  const to = document.querySelector('select')?.value || document.getElementById('to')?.value || 'Somewhere Nice';
+  const date = document.querySelector('input[type="date"]')?.value || localDateString();
+  const passengers = document.querySelectorAll('select')[1]?.value || '1 passenger';
+  const result = document.getElementById('result') || createBookingResult();
   const now = new Date();
   const liveStatus = now.getMinutes() % 2 === 0 ? 'probably on time' : 'questionably on time';
-  result.innerHTML = `✈️ <strong>Flight found!</strong> ${from} → ${to}. Departure status: <strong>${liveStatus}</strong>. Gate: <strong>???</strong>. <button onclick="fakeBook()" style="margin-left:10px;border:0;border-radius:999px;padding:8px 13px;font-weight:800">Book it</button>`;
+  result.classList.remove('hidden');
+  result.innerHTML = `✈️ <strong>Flight found!</strong><br>${from} → ${to}<br>📅 ${date} · 👤 ${passengers}<br>Departure status: <strong>${liveStatus}</strong> · Gate: <strong>???</strong><br><button class="primary" onclick="confirmBooking()">Book this flight 🎫</button>`;
+  result.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-function fakeBook() {
-  alert('Excellent choice. Your booking is confirmed-ish. Please arrive at the airport sometime before the flight. 🎫');
+function createBookingResult() {
+  const result = document.createElement('div');
+  result.id = 'result';
+  result.className = 'quote';
+  const button = document.querySelector('.primary');
+  if (button) button.parentNode.appendChild(result);
+  else document.querySelector('main')?.appendChild(result);
+  return result;
 }
 
-// -------------------- LUPIN MILES --------------------
+function confirmBooking() {
+  alert('🎫 BOOKING CONFIRMED-ISH! Your seat is somewhere on the aircraft. Please keep this screen as proof that Lupin Airlines promised something.');
+}
 
-const MILES_KEY = 'lupinAirlinesMiles';
+function fakeBook() { confirmBooking(); }
+
+// ---------------- Lupin Miles ----------------
+const MILES_KEY = 'lupinMilesBalance';
+const DEFAULT_MILES = 12;
 
 function getMiles() {
-  return Number(localStorage.getItem(MILES_KEY) || 12);
+  const saved = Number(localStorage.getItem(MILES_KEY));
+  return Number.isFinite(saved) && saved >= 0 ? Math.floor(saved) : DEFAULT_MILES;
 }
 
 function setMiles(value) {
-  const miles = Math.max(0, Math.floor(value));
-  localStorage.setItem(MILES_KEY, miles);
+  const miles = Math.max(0, Math.floor(Number(value) || 0));
+  localStorage.setItem(MILES_KEY, String(miles));
   updateMilesUI();
-  return miles;
 }
 
 function getMilesTier(miles) {
-  if (miles >= 25000) return { name: 'Golden Pants', next: null, target: 25000 };
-  if (miles >= 5000) return { name: 'Silver Pants', next: 'Golden Pants', target: 25000 };
-  return { name: 'Bronze Pants', next: 'Silver Pants', target: 5000 };
+  if (miles >= 25000) return { name: 'Golden Pants', next: null };
+  if (miles >= 5000) return { name: 'Silver Pants', next: 25000 };
+  return { name: 'Bronze Pants', next: 5000 };
 }
 
 function updateMilesUI() {
-  const balance = getMiles();
-  const tier = getMilesTier(balance);
-  const balanceEl = document.getElementById('miles-balance');
+  if (!document.body.dataset.page || document.body.dataset.page !== 'miles') return;
+  const miles = getMiles();
+  const tier = getMilesTier(miles);
+  const balance = document.getElementById('miles-balance');
   const tierEl = document.getElementById('miles-tier');
   const nextEl = document.getElementById('miles-next');
-  const progressEl = document.getElementById('miles-progress-text');
-  const moodEl = document.getElementById('miles-mood');
-
-  if (!balanceEl) return;
-  balanceEl.textContent = balance.toLocaleString();
+  if (balance) balance.textContent = miles.toLocaleString();
   if (tierEl) tierEl.textContent = tier.name;
-
-  if (!tier.next) {
-    if (nextEl) nextEl.textContent = 'MAX';
-    if (progressEl) progressEl.textContent = 'You have achieved maximum pants.';
-  } else {
-    const remaining = tier.target - balance;
-    if (nextEl) nextEl.textContent = tier.target.toLocaleString();
-    if (progressEl) progressEl.textContent = `${remaining.toLocaleString()} miles to ${tier.next}`;
-  }
-
-  if (moodEl) {
-    moodEl.textContent = balance >= 25000 ? 'Extremely suspiciously loyal' : balance >= 5000 ? 'Suspiciously loyal' : 'New-ish passenger';
-  }
+  if (nextEl) nextEl.textContent = tier.next ? `${(tier.next - miles).toLocaleString()} miles to next tier` : 'You have reached the highest tier 🎉';
 }
 
 function earnMiles() {
-  const input = document.getElementById('miles-input');
-  const message = document.getElementById('miles-message');
+  const input = document.getElementById('earn-miles');
   const amount = Number(input?.value);
   if (!Number.isFinite(amount) || amount <= 0) {
-    if (message) {
-      message.classList.remove('hidden');
-      message.textContent = '❌ Please enter a positive number of miles. Even Lupin Airlines needs numbers.';
-    }
+    alert('Please enter a positive number of miles. Even Lupin Airlines can do basic arithmetic.');
     return;
   }
-
-  const oldBalance = getMiles();
-  const newBalance = setMiles(oldBalance + amount);
-  if (message) {
-    message.classList.remove('hidden');
-    message.textContent = `🎉 +${Math.floor(amount).toLocaleString()} miles! Your balance is now ${newBalance.toLocaleString()} miles. We have no idea where you flew, but congratulations.`;
-  }
-  input.value = '';
+  setMiles(getMiles() + Math.floor(amount));
+  if (input) input.value = '';
 }
 
-function redeemMiles(cost) {
-  const balance = getMiles();
-  if (balance < cost) {
-    alert(`❌ Not enough Lupin Miles. You need ${cost.toLocaleString()} miles, but only have ${balance.toLocaleString()}. Please fly somewhere questionable first.`);
+function redeemMiles(cost, reward) {
+  if (getMiles() < cost) {
+    alert(`❌ Not enough miles. You need ${cost.toLocaleString()} miles for ${reward}.`);
     return;
   }
-  setMiles(balance - cost);
-  alert(`🎁 Redeemed ${cost.toLocaleString()} Lupin Miles! Your new balance is ${getMiles().toLocaleString()} miles. Enjoy your questionable reward.`);
+  setMiles(getMiles() - cost);
+  alert(`🎉 Redeemed ${cost.toLocaleString()} miles for ${reward}! This reward is absolutely, definitely, probably real.`);
 }
 
 const mdmRemarks = {
@@ -191,7 +171,6 @@ const mdmRemarks = {
 
 const page = location.pathname.split('/').pop() || 'index.html';
 const remark = mdmRemarks[page];
-
 if (remark && !document.querySelector('.mdm-remark')) {
   const footer = document.querySelector('footer');
   if (footer) {
@@ -204,6 +183,6 @@ if (remark && !document.querySelector('.mdm-remark')) {
 
 document.addEventListener('DOMContentLoaded', () => {
   updateClock();
-  updateMilesUI();
   setInterval(updateClock, 1000);
+  updateMilesUI();
 });
