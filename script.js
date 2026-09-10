@@ -20,10 +20,8 @@ function updateClock() {
     if (nav) nav.parentNode.insertBefore(clock, nav.nextSibling);
   }
   clock.textContent = `🕒 ${dateText} · ${time}`;
-
   const date = document.getElementById('date');
   if (date && !date.value) date.value = localDateString(now);
-
   document.querySelectorAll('[data-time]').forEach(el => { el.textContent = time; });
   updateFlightStatuses(now);
 }
@@ -72,9 +70,10 @@ function bookNow() {
 
 function searchFlight() {
   const from = document.getElementById('from')?.value || 'Lupin International';
-  const to = document.querySelector('select')?.value || document.getElementById('to')?.value || 'Somewhere Nice';
+  const selects = document.querySelectorAll('select');
+  const to = selects[0]?.value || 'Somewhere Nice';
   const date = document.querySelector('input[type="date"]')?.value || localDateString();
-  const passengers = document.querySelectorAll('select')[1]?.value || '1 passenger';
+  const passengers = selects[1]?.value || '1 passenger';
   const result = document.getElementById('result') || createBookingResult();
   const now = new Date();
   const liveStatus = now.getMinutes() % 2 === 0 ? 'probably on time' : 'questionably on time';
@@ -121,35 +120,49 @@ function getMilesTier(miles) {
 }
 
 function updateMilesUI() {
-  if (!document.body.dataset.page || document.body.dataset.page !== 'miles') return;
+  if (document.body.dataset.page !== 'miles') return;
   const miles = getMiles();
   const tier = getMilesTier(miles);
   const balance = document.getElementById('miles-balance');
   const tierEl = document.getElementById('miles-tier');
   const nextEl = document.getElementById('miles-next');
+  const progressText = document.getElementById('miles-progress-text');
+  const mood = document.getElementById('miles-mood');
   if (balance) balance.textContent = miles.toLocaleString();
   if (tierEl) tierEl.textContent = tier.name;
-  if (nextEl) nextEl.textContent = tier.next ? `${(tier.next - miles).toLocaleString()} miles to next tier` : 'You have reached the highest tier 🎉';
+  if (tier.next) {
+    const remaining = tier.next - miles;
+    if (nextEl) nextEl.textContent = remaining.toLocaleString();
+    if (progressText) progressText.textContent = `${remaining.toLocaleString()} miles to ${tier.next === 5000 ? 'Silver Pants' : 'Golden Pants'}`;
+  } else {
+    if (nextEl) nextEl.textContent = 'MAX';
+    if (progressText) progressText.textContent = 'Highest tier reached 🎉';
+  }
+  if (mood) mood.textContent = miles >= 25000 ? 'Suspiciously powerful' : miles >= 5000 ? 'Very committed' : 'Suspiciously loyal';
 }
 
 function earnMiles() {
-  const input = document.getElementById('earn-miles');
+  const input = document.getElementById('miles-input');
+  const message = document.getElementById('miles-message');
   const amount = Number(input?.value);
   if (!Number.isFinite(amount) || amount <= 0) {
-    alert('Please enter a positive number of miles. Even Lupin Airlines can do basic arithmetic.');
+    if (message) { message.textContent = '❌ Enter a positive number of miles.'; message.classList.remove('hidden'); }
     return;
   }
-  setMiles(getMiles() + Math.floor(amount));
+  const added = Math.floor(amount);
+  setMiles(getMiles() + added);
   if (input) input.value = '';
+  if (message) { message.textContent = `✅ Added ${added.toLocaleString()} miles. Your new balance is ${getMiles().toLocaleString()} miles.`; message.classList.remove('hidden'); }
 }
 
-function redeemMiles(cost, reward) {
+function redeemMiles(cost) {
+  const rewards = { 500: 'a snack 🍪', 2500: 'priority-ish boarding 🎟️', 5000: 'a free-ish flight ✈️' };
   if (getMiles() < cost) {
-    alert(`❌ Not enough miles. You need ${cost.toLocaleString()} miles for ${reward}.`);
+    alert(`❌ Not enough miles. You have ${getMiles().toLocaleString()} and need ${cost.toLocaleString()}.`);
     return;
   }
   setMiles(getMiles() - cost);
-  alert(`🎉 Redeemed ${cost.toLocaleString()} miles for ${reward}! This reward is absolutely, definitely, probably real.`);
+  alert(`🎉 Redeemed ${cost.toLocaleString()} miles for ${rewards[cost] || 'a mysterious Lupin reward'}!`);
 }
 
 const mdmRemarks = {
