@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lupin Airlines ✈️</title>
+  <meta name="description" content="Lupin Airlines — the world's most questionably reliable airline.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top"><span class="logo">🐊</span> LUPIN AIRLINES</a>
+    <nav>
+      <a href="#flights">Flights</a>
+      <a href="#experience">Experience</a>
+      <a href="#about">About</a>
+    </nav>
+    <button class="nav-button" onclick="bookNow()">Book now</button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">WELCOME ABOARD · PROBABLY</p>
+        <h1>Fly somewhere.<br><span>Eventually.</span></h1>
+        <p class="lead">Lupin Airlines connects you to destinations you probably intended to visit, using aircraft that have passed several of our tests.</p>
+        <div class="hero-actions">
+          <button class="primary" onclick="scrollToFlights()">Find a flight ✈</button>
+          <button class="secondary" onclick="showNotice()">Why Lupin?</button>
+        </div>
+        <p class="tiny">★ Rated 4.2/5 by people who survived the turbulence</p>
+      </div>
+      <div class="mascot-card">
+        <div class="orbit one"></div><div class="orbit two"></div>
+        <div class="mascot">🐊</div>
+        <div class="badge">OFFICIAL<br>MASCOT</div>
+        <p>SCRAGGY<br><small>Chief Vibes Officer</small></p>
+      </div>
+    </section>
+
+    <section id="flights" class="search-section">
+      <div class="section-heading"><p class="eyebrow">FLIGHT SEARCH</p><h2>Where are you going?</h2></div>
+      <div class="search-box">
+        <label>From<input id="from" value="Lupin International" placeholder="Departure"></label>
+        <label>To<select id="to"><option>Somewhere Nice</option><option>Definitely Not Area 51</option><option>Scraggy's House</option><option>Singapore, Probably</option><option>The Moon (delayed)</option></select></label>
+        <label>Date<input type="date" id="date"></label>
+        <button class="primary search-button" onclick="searchFlight()">Search flights</button>
+      </div>
+      <div id="result" class="result hidden"></div>
+    </section>
+
+    <section id="experience" class="features">
+      <div class="feature"><div class="icon">🧳</div><h3>Checked baggage</h3><p>We guarantee your bag will arrive. We don't guarantee <em>when</em>.</p></div>
+      <div class="feature"><div class="icon">🍪</div><h3>Inflight snacks</h3><p>Enjoy our complimentary snack. It is one (1) snack. Please choose wisely.</p></div>
+      <div class="feature"><div class="icon">📡</div><h3>Premium Wi-Fi</h3><p>Connect at 35,000 feet and discover whether the internet works today.</p></div>
+    </section>
+
+    <section class="quote">
+      <p>“We left at 9:00 AM and arrived at 9:17 AM.”</p>
+      <span>— A very confused passenger</span>
+    </section>
+
+    <section id="about" class="about">
+      <div><p class="eyebrow">THE LUPIN STANDARD</p><h2>Questionable reliability.<br>Unquestionable style.</h2></div>
+      <div><p>Lupin Airlines was founded on three principles: get people places, look cool doing it, and never explain why the departure board says “maybe.”</p><p>Our mascot Scraggy personally oversees every flight. He has no aviation qualifications, but he has excellent pants.</p></div>
+    </section>
+  </main>
+
+  <footer>
+    <div><strong>🐊 LUPIN AIRLINES</strong><p>The world's most questionably reliable airline.</p></div>
+    <div class="legal">Fan-made parody project. Not affiliated with or endorsed by The Pokémon Company, Nintendo, or Game Freak. Pokémon and Scraggy are trademarks of their respective owners.</div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
