@@ -1,14 +1,13 @@
 const date = document.getElementById('date');
 if (date) date.value = new Date().toISOString().slice(0,10);
-
-function scrollToFlights(){document.getElementById('flights').scrollIntoView({behavior:'smooth'});}
+function scrollToFlights(){const flights=document.getElementById('flights');if(flights)flights.scrollIntoView({behavior:'smooth'});else window.location.href='flights.html';}
 function showNotice(){alert('Because we are Lupin Airlines. That is the entire explanation. 🐊');}
-function bookNow(){scrollToFlights();}
-function searchFlight(){
-  const from=document.getElementById('from').value || 'somewhere';
-  const to=document.getElementById('to').value;
-  const result=document.getElementById('result');
-  result.classList.remove('hidden');
-  result.innerHTML=`✈️ <strong>Flight found!</strong> ${from} → ${to}. Departure status: <strong>probably on time</strong>. Gate: <strong>???</strong>. <button onclick="fakeBook()" style="margin-left:10px;border:0;border-radius:999px;padding:8px 13px;font-weight:800">Book it</button>`;
-}
+function bookNow(){if(document.getElementById('flights'))scrollToFlights();else window.location.href='booking.html';}
+function searchFlight(){const from=document.getElementById('from')?.value||'somewhere';const to=document.getElementById('to')?.value||'somewhere nice';const result=document.getElementById('result');if(!result)return;result.classList.remove('hidden');result.innerHTML=`✈️ <strong>Flight found!</strong> ${from} → ${to}. Departure status: <strong>probably on time</strong>. Gate: <strong>???</strong>. <button onclick="fakeBook()" style="margin-left:10px;border:0;border-radius:999px;padding:8px 13px;font-weight:800">Book it</button>`;}
 function fakeBook(){alert('Excellent choice. Your booking is confirmed-ish. Please arrive at the airport sometime before the flight. 🎫');}
+
+const mdmRemarks={
+'index.html':'This airline looks expensive. I am suspicious.','flights.html':'LP 404 is the most honest flight number I have ever seen.','destinations.html':'I asked where we were going. They said “probably”.','booking.html':'I booked a flight. The website congratulated me. Nobody knows why.','experience.html':'The snacks were good. The Wi-Fi was emotionally unavailable.','baggage.html':'My suitcase arrived before me. I am now worried.','contact.html':'I called customer service. Scraggy answered. Very professional.','about.html':'Scraggy has no qualifications. Finally, a relatable executive.','miles.html':'I have 12 miles. Apparently this is enough for one biscuit.','status.html':'The flight status changed three times while I was reading it.','fleet.html':'If the plane has wings, I suppose that is encouraging.','cabins.html':'Scraggy First sounds luxurious. I demand pants.','careers.html':'I applied for Delay Optimist. I have extensive experience waiting.','airport-map.html':'The map says Gate ???. Excellent. Very clear.'};
+const page=location.pathname.split('/').pop()||'index.html';
+const remark=mdmRemarks[page];
+if(remark&&!document.querySelector('.mdm-remark')){const footer=document.querySelector('footer');if(footer){const box=document.createElement('section');box.className='mdm-remark';box.innerHTML=`<span>REMARK OF THE DAY</span><p>“${remark}”</p><strong>— Mdm Wrong-Wrong</strong>`;footer.parentNode.insertBefore(box,footer);}}
