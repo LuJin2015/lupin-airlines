@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',()=>{let c=document.createElement('div');c.className='live-clock';c.style.cssText='font-size:11px;font-weight:800;white-space:nowrap';document.querySelector('.topbar')?.append(c);const tick=()=>c.textContent='🕒 '+new Date().toLocaleTimeString();tick();setInterval(tick,1000)})
