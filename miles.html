@@ -6,7 +6,7 @@
   <title>Lupin Miles — Lupin Airlines ✈️</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-page="miles">
   <header class="topbar">
     <a class="brand" href="index.html"><img class="logo" src="https://img.pokemondb.net/artwork/scraggy.jpg" alt="Scraggy"> LUPIN AIRLINES</a>
     <nav>
@@ -25,13 +25,13 @@
     <section class="home-links">
       <a>
         <span>YOUR BALANCE</span>
-        <h2><strong id="miles-balance">0</strong> miles</h2>
+        <h2><strong id="miles-balance">12</strong> miles</h2>
         <p id="miles-tier">Bronze Pants</p>
       </a>
       <a>
         <span>NEXT TIER</span>
-        <h2 id="miles-next">5,000</h2>
-        <p id="miles-progress-text">5,000 miles to Silver Pants</p>
+        <h2 id="miles-next">4,988</h2>
+        <p id="miles-progress-text">4,988 miles to Silver Pants</p>
       </a>
       <a>
         <span>STATUS</span>
@@ -40,20 +40,20 @@
       </a>
     </section>
 
-    <section class="search-box">
+    <section class="search-card">
       <h2>Earn Lupin Miles</h2>
       <p>Enter how many miles you supposedly flew. We will believe you.</p>
       <div class="search-grid">
         <label>Flight miles<input id="miles-input" type="number" min="1" step="1" placeholder="e.g. 850"></label>
-        <button class="nav-button" type="button" onclick="earnMiles()">Earn miles ✈️</button>
+        <button class="primary" type="button" onclick="earnMiles()">Earn miles ✈️</button>
       </div>
       <p id="miles-message" class="hidden"></p>
     </section>
 
     <section class="home-links">
-      <a href="javascript:redeemMiles(500)"><span>REDEEM · 500</span><h2>Snack</h2><p>One suspiciously free snack.</p></a>
-      <a href="javascript:redeemMiles(2500)"><span>REDEEM · 2,500</span><h2>Priority-ish</h2><p>Maybe you get on the plane first.</p></a>
-      <a href="javascript:redeemMiles(5000)"><span>REDEEM · 5,000</span><h2>Free-ish Flight</h2><p>Terms, conditions and pants may apply.</p></a>
+      <a href="#" onclick="redeemMiles(500); return false;"><span>REDEEM · 500</span><h2>Snack</h2><p>One suspiciously free snack.</p></a>
+      <a href="#" onclick="redeemMiles(2500); return false;"><span>REDEEM · 2,500</span><h2>Priority-ish</h2><p>Maybe you get on the plane first.</p></a>
+      <a href="#" onclick="redeemMiles(5000); return false;"><span>REDEEM · 5,000</span><h2>Free-ish Flight</h2><p>Terms, conditions and pants may apply.</p></a>
     </section>
 
     <section class="quote">
