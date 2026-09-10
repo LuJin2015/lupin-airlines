@@ -42,25 +42,17 @@ function updateFlightStatuses(now = new Date()) {
   document.querySelectorAll('.route-grid article').forEach(card => {
     const code = card.querySelector('b')?.textContent.trim();
     if (!flights[code]) return;
-
     const [hour, minute] = flights[code].split(':').map(Number);
     const departure = new Date(now);
     departure.setHours(hour, minute, 0, 0);
     const diff = Math.round((departure - now) / 60000);
     const status = card.querySelector('strong');
     if (!status) return;
-
-    if (diff > 180) {
-      status.textContent = '🟢 Scheduled · ' + formatCountdown(diff);
-    } else if (diff > 30) {
-      status.textContent = '🟡 Boarding in ' + formatCountdown(diff);
-    } else if (diff >= 0) {
-      status.textContent = '🟠 Boarding NOW · Please panic calmly';
-    } else if (diff > -60) {
-      status.textContent = '🔴 Departed ' + formatCountdown(Math.abs(diff)) + ' ago';
-    } else {
-      status.textContent = '⚪ Flight has left the building';
-    }
+    if (diff > 180) status.textContent = '🟢 Scheduled · ' + formatCountdown(diff);
+    else if (diff > 30) status.textContent = '🟡 Boarding in ' + formatCountdown(diff);
+    else if (diff >= 0) status.textContent = '🟠 Boarding NOW · Please panic calmly';
+    else if (diff > -60) status.textContent = '🔴 Departed ' + formatCountdown(Math.abs(diff)) + ' ago';
+    else status.textContent = '⚪ Flight has left the building';
   });
 }
 
@@ -101,6 +93,85 @@ function fakeBook() {
   alert('Excellent choice. Your booking is confirmed-ish. Please arrive at the airport sometime before the flight. 🎫');
 }
 
+// -------------------- LUPIN MILES --------------------
+
+const MILES_KEY = 'lupinAirlinesMiles';
+
+function getMiles() {
+  return Number(localStorage.getItem(MILES_KEY) || 12);
+}
+
+function setMiles(value) {
+  const miles = Math.max(0, Math.floor(value));
+  localStorage.setItem(MILES_KEY, miles);
+  updateMilesUI();
+  return miles;
+}
+
+function getMilesTier(miles) {
+  if (miles >= 25000) return { name: 'Golden Pants', next: null, target: 25000 };
+  if (miles >= 5000) return { name: 'Silver Pants', next: 'Golden Pants', target: 25000 };
+  return { name: 'Bronze Pants', next: 'Silver Pants', target: 5000 };
+}
+
+function updateMilesUI() {
+  const balance = getMiles();
+  const tier = getMilesTier(balance);
+  const balanceEl = document.getElementById('miles-balance');
+  const tierEl = document.getElementById('miles-tier');
+  const nextEl = document.getElementById('miles-next');
+  const progressEl = document.getElementById('miles-progress-text');
+  const moodEl = document.getElementById('miles-mood');
+
+  if (!balanceEl) return;
+  balanceEl.textContent = balance.toLocaleString();
+  if (tierEl) tierEl.textContent = tier.name;
+
+  if (!tier.next) {
+    if (nextEl) nextEl.textContent = 'MAX';
+    if (progressEl) progressEl.textContent = 'You have achieved maximum pants.';
+  } else {
+    const remaining = tier.target - balance;
+    if (nextEl) nextEl.textContent = tier.target.toLocaleString();
+    if (progressEl) progressEl.textContent = `${remaining.toLocaleString()} miles to ${tier.next}`;
+  }
+
+  if (moodEl) {
+    moodEl.textContent = balance >= 25000 ? 'Extremely suspiciously loyal' : balance >= 5000 ? 'Suspiciously loyal' : 'New-ish passenger';
+  }
+}
+
+function earnMiles() {
+  const input = document.getElementById('miles-input');
+  const message = document.getElementById('miles-message');
+  const amount = Number(input?.value);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    if (message) {
+      message.classList.remove('hidden');
+      message.textContent = '❌ Please enter a positive number of miles. Even Lupin Airlines needs numbers.';
+    }
+    return;
+  }
+
+  const oldBalance = getMiles();
+  const newBalance = setMiles(oldBalance + amount);
+  if (message) {
+    message.classList.remove('hidden');
+    message.textContent = `🎉 +${Math.floor(amount).toLocaleString()} miles! Your balance is now ${newBalance.toLocaleString()} miles. We have no idea where you flew, but congratulations.`;
+  }
+  input.value = '';
+}
+
+function redeemMiles(cost) {
+  const balance = getMiles();
+  if (balance < cost) {
+    alert(`❌ Not enough Lupin Miles. You need ${cost.toLocaleString()} miles, but only have ${balance.toLocaleString()}. Please fly somewhere questionable first.`);
+    return;
+  }
+  setMiles(balance - cost);
+  alert(`🎁 Redeemed ${cost.toLocaleString()} Lupin Miles! Your new balance is ${getMiles().toLocaleString()} miles. Enjoy your questionable reward.`);
+}
+
 const mdmRemarks = {
   'index.html': 'This airline looks expensive. I am suspicious.',
   'flights.html': 'LP 404 is the most honest flight number I have ever seen.',
@@ -133,5 +204,6 @@ if (remark && !document.querySelector('.mdm-remark')) {
 
 document.addEventListener('DOMContentLoaded', () => {
   updateClock();
+  updateMilesUI();
   setInterval(updateClock, 1000);
 });
