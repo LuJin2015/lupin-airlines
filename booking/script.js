@@ -11,45 +11,17 @@ const flights={
   "Singapore, Probably":{code:'LP 314',time:'14:20',gate:'12',price:314},
   "The Moon":{code:'LP 9001',time:'23:59',gate:'space',price:9001}
 };
-
 function searchFlight(){
-  const destination=document.getElementById('destination');
-  const date=document.getElementById('flight-date');
-  const passengers=document.getElementById('passengers');
-  const result=document.getElementById('result');
+  const destination=document.getElementById('destination'),date=document.getElementById('flightDate'),passengers=document.getElementById('passengers'),result=document.getElementById('result');
   if(!destination||!result)return;
-
   const flight=flights[destination.value];
-  if(!flight){
-    result.className='booking-result';
-    result.innerHTML='<strong>⚠️ Please choose a destination first.</strong>';
-    return;
-  }
-
+  if(!flight){result.className='booking-result';result.innerHTML='<strong>⚠️ Please choose a destination first.</strong>';return;}
   const pax=passengers?passengers.value:'1 passenger';
   const chosenDate=date&&date.value?date.value:new Date().toISOString().slice(0,10);
   result.className='booking-result';
   result.innerHTML=`<small>✈️ FLIGHT FOUND · PROBABLY</small><h3>${flight.code} · ${destination.value}</h3><p>🕒 Departure: <strong>${flight.time}</strong> · 🚪 Gate <strong>${flight.gate}</strong></p><p>📅 Date: <strong>${chosenDate}</strong> · 👤 <strong>${pax}</strong></p><p class="fare">💰 Fare: <strong>S$${flight.price.toLocaleString()}</strong></p><button type="button" class="primary" id="confirm-flight">🎫 Book this flight</button>`;
-
   document.getElementById('confirm-flight').addEventListener('click',()=>confirmBooking(flight.code,flight.price));
   result.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-
-function confirmBooking(code,price){
-  const k='lupinMilesBalance';
-  const n=Number(localStorage.getItem(k));
-  localStorage.setItem(k,String((Number.isFinite(n)?n:12)+500));
-  alert(`🎫 BOOKING CONFIRMED-ISH!\n${code} · S$${price.toLocaleString()}\n+500 Lupin Miles`);
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  const destination=document.getElementById('destination');
-  const date=document.getElementById('flight-date');
-  const requested=new URLSearchParams(window.location.search).get('destination');
-
-  if(destination&&requested&&flights[requested])destination.value=requested;
-  if(date&&!date.value)date.value=new Date().toISOString().slice(0,10);
-
-  const searchButton=document.getElementById('search-flights');
-  if(searchButton)searchButton.addEventListener('click',searchFlight);
-});
+function confirmBooking(code,price){const k='lupinMilesBalance',n=Number(localStorage.getItem(k));localStorage.setItem(k,String((Number.isFinite(n)?n:12)+500));alert(`🎫 BOOKING CONFIRMED-ISH!\n${code} · S$${price.toLocaleString()}\n+500 Lupin Miles`)}
+document.addEventListener('DOMContentLoaded',()=>{const destination=document.getElementById('destination'),date=document.getElementById('flightDate'),searchButton=document.getElementById('searchButton'),requested=new URLSearchParams(window.location.search).get('destination');if(destination&&requested&&flights[requested])destination.value=requested;if(date&&!date.value)date.value=new Date().toISOString().slice(0,10);if(searchButton)searchButton.addEventListener('click',searchFlight)});
