@@ -1,197 +1,25 @@
 const SPREADSHEET_ID = '1CGWCDA_blvF_1D2OXnoB3Z6Kn_pMVuMahx8xU_nf8co';
 const SHEET_NAME = 'flights';
 const ACCOUNTS_SHEET_NAME = 'accounts';
-const ADMIN_KEY = 'lupin-air-2026';
+const ADMIN_KEY = 'CHANGE_THIS_ADMIN_KEY';
 const SESSION_DAYS = 30;
-
-function json_(data) {
-  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
-}
-
-function getSpreadsheet_() {
-  return SpreadsheetApp.openById(SPREADSHEET_ID);
-}
-
-function getSheet_() {
-  const ss = getSpreadsheet_();
-  let sheet = ss.getSheetByName(SHEET_NAME);
-  if (!sheet) throw new Error('Could not find the sheet named "flights".');
-
-  const headers = ['Booking ID','Booked At','Passenger','Flight','Destination','Date','Time','Gate','Passengers','Fare','Account','Status'];
-  if (sheet.getLastRow() === 0) {
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    sheet.setFrozenRows(1);
-  } else {
-    const current = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), headers.length)).getDisplayValues()[0];
-    for (let i = 0; i < headers.length; i++) {
-      if (current[i] !== headers[i]) sheet.getRange(1, i + 1).setValue(headers[i]);
-    }
-  }
-  return sheet;
-}
-
-function getAccountsSheet_() {
-  const ss = getSpreadsheet_();
-  let sheet = ss.getSheetByName(ACCOUNTS_SHEET_NAME);
-  if (!sheet) sheet = ss.insertSheet(ACCOUNTS_SHEET_NAME);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Username','Password Hash','Salt','Created At','Session Token Hash','Session Created At']);
-    sheet.setFrozenRows(1);
-  }
-  return sheet;
-}
-
-function hash_(value) {
-  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(value), Utilities.Charset.UTF_8);
-  return bytes.map(function(b) {
-    const n = b < 0 ? b + 256 : b;
-    return ('0' + n.toString(16)).slice(-2);
-  }).join('');
-}
-
-function newToken_() {
-  return Utilities.getUuid() + '-' + Utilities.getUuid();
-}
-
-function findAccountRow_(username) {
-  const sheet = getAccountsSheet_();
-  const values = sheet.getDataRange().getValues();
-  const wanted = String(username).toLowerCase();
-  for (let i = 1; i < values.length; i++) {
-    if (String(values[i][0]).toLowerCase() === wanted) return { sheet: sheet, row: i + 1, values: values[i] };
-  }
-  return null;
-}
-
-function accountFromToken_(token) {
-  if (!token) return null;
-  const sheet = getAccountsSheet_();
-  const values = sheet.getDataRange().getValues();
-  const wanted = hash_(token);
-  const now = Date.now();
-  for (let i = 1; i < values.length; i++) {
-    const tokenHash = String(values[i][4] || '');
-    const created = values[i][5] ? new Date(values[i][5]).getTime() : 0;
-    if (tokenHash && tokenHash === wanted && created && now - created <= SESSION_DAYS * 86400000) {
-      return { username: String(values[i][0]), row: i + 1, sheet: sheet };
-    }
-  }
-  return null;
-}
-
-function register_(body) {
-  const username = String(body.username || '').trim();
-  const password = String(body.password || '');
-  if (!/^[A-Za-z0-9_-]{3,20}$/.test(username)) throw new Error('Username must be 3–20 letters, numbers, _ or -.');
-  if (password.length < 6) throw new Error('Password must be at least 6 characters.');
-  if (findAccountRow_(username)) throw new Error('That username is already taken.');
-
-  const salt = Utilities.getUuid();
-  const token = newToken_();
-  const sheet = getAccountsSheet_();
-  sheet.appendRow([username, hash_(salt + '|' + password), salt, new Date(), hash_(token), new Date()]);
-  return { ok: true, username: username, token: token };
-}
-
-function login_(body) {
-  const username = String(body.username || '').trim();
-  const password = String(body.password || '');
-  const account = findAccountRow_(username);
-  if (!account) throw new Error('Incorrect username or password.');
-  const storedHash = String(account.values[1] || '');
-  const salt = String(account.values[2] || '');
-  if (hash_(salt + '|' + password) !== storedHash) throw new Error('Incorrect username or password.');
-
-  const token = newToken_();
-  account.sheet.getRange(account.row, 5, 1, 2).setValues([[hash_(token), new Date()]]);
-  return { ok: true, username: String(account.values[0]), token: token };
-}
-
-function bookingsForAccount_(username) {
-  const sheet = getSheet_();
-  const values = sheet.getDataRange().getDisplayValues();
-  const result = [];
-  for (let i = 1; i < values.length; i++) {
-    if (String(values[i][10] || '').toLowerCase() === String(username).toLowerCase()) {
-      result.push({
-        bookingId: values[i][0], bookedAt: values[i][1], passenger: values[i][2], flight: values[i][3],
-        destination: values[i][4], date: values[i][5], time: values[i][6], gate: values[i][7],
-        passengers: values[i][8], fare: values[i][9], status: values[i][11] || 'Confirmed'
-      });
-    }
-  }
-  return result.reverse();
-}
-
-function book_(body, account) {
-  if (!body.flight || !body.destination || !body.date) throw new Error('Missing booking information.');
-  const name = String(body.name || '').trim().slice(0, 40);
-  if (!name) throw new Error('Passenger name is required.');
-  const id = 'LUP-' + Utilities.getUuid().replace(/-/g, '').slice(0, 6).toUpperCase();
-  getSheet_().appendRow([
-    id, new Date(), name, String(body.flight), String(body.destination), String(body.date), String(body.time || ''),
-    String(body.gate || ''), String(body.passengers || ''), Number(body.price) || 0, account.username, 'Confirmed'
-  ]);
-  return { ok: true, bookingId: id };
-}
-
-function cancel_(body, account) {
-  const bookingId = String(body.bookingId || '').trim();
-  if (!bookingId) throw new Error('Booking ID is required.');
-  const sheet = getSheet_();
-  const values = sheet.getDataRange().getDisplayValues();
-  for (let i = 1; i < values.length; i++) {
-    if (values[i][0] === bookingId) {
-      if (String(values[i][10]).toLowerCase() !== String(account.username).toLowerCase()) throw new Error('That booking does not belong to your account.');
-      if ((values[i][11] || 'Confirmed') === 'Cancelled') throw new Error('This booking is already cancelled.');
-      sheet.getRange(i + 1, 12).setValue('Cancelled');
-      return { ok: true, bookingId: bookingId, status: 'Cancelled' };
-    }
-  }
-  throw new Error('Booking not found.');
-}
-
-function doPost(e) {
-  try {
-    const body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
-    const action = String(body.action || 'book');
-    const lock = LockService.getScriptLock();
-    lock.waitLock(10000);
-    try {
-      if (action === 'register') return json_(register_(body));
-      if (action === 'login') return json_(login_(body));
-      if (action === 'book') {
-        const account = accountFromToken_(String(body.token || ''));
-        if (!account) return json_({ ok: false, error: 'Please log in before booking.' });
-        return json_(book_(body, account));
-      }
-      if (action === 'myBookings') {
-        const account = accountFromToken_(String(body.token || ''));
-        if (!account) return json_({ ok: false, error: 'Your session has expired. Please log in again.' });
-        return json_({ ok: true, username: account.username, bookings: bookingsForAccount_(account.username) });
-      }
-      if (action === 'cancel') {
-        const account = accountFromToken_(String(body.token || ''));
-        if (!account) return json_({ ok: false, error: 'Your session has expired. Please log in again.' });
-        return json_(cancel_(body, account));
-      }
-      return json_({ ok: false, error: 'Unknown action.' });
-    } finally {
-      lock.releaseLock();
-    }
-  } catch (err) {
-    return json_({ ok: false, error: String(err.message || err) });
-  }
-}
-
-function doGet(e) {
-  try {
-    const key = String((e.parameter && e.parameter.key) || '');
-    if (key !== ADMIN_KEY) return json_({ ok: false, error: 'Unauthorized.' });
-    const sheet = getSheet_();
-    const values = sheet.getDataRange().getDisplayValues();
-    return json_({ ok: true, bookings: values.length > 1 ? values.slice(1).reverse() : [] });
-  } catch (err) {
-    return json_({ ok: false, error: String(err.message || err) });
-  }
-}
+const DEFAULT_MILES = 12;
+function json_(d){return ContentService.createTextOutput(JSON.stringify(d)).setMimeType(ContentService.MimeType.JSON)}
+function ss_(){return SpreadsheetApp.openById(SPREADSHEET_ID)}
+function getSheet_(){const s=ss_().getSheetByName(SHEET_NAME);if(!s)throw new Error('Could not find the sheet named "flights".');const h=['Booking ID','Booked At','Passenger','Flight','Destination','Date','Time','Gate','Passengers','Fare','Account','Status'];if(s.getLastRow()===0){s.getRange(1,1,1,h.length).setValues([h]);s.setFrozenRows(1)}else{const c=s.getRange(1,1,1,Math.max(s.getLastColumn(),h.length)).getDisplayValues()[0];h.forEach((x,i)=>{if(c[i]!==x)s.getRange(1,i+1).setValue(x)})}return s}
+function accounts_(){const s=ss_();let a=s.getSheetByName(ACCOUNTS_SHEET_NAME);if(!a)a=s.insertSheet(ACCOUNTS_SHEET_NAME);const h=['Username','Password Hash','Salt','Created At','Session Token Hash','Session Created At','Lupin Miles'];if(a.getLastRow()===0){a.getRange(1,1,1,h.length).setValues([h]);a.setFrozenRows(1)}else{h.forEach((x,i)=>{if(a.getRange(1,i+1).getDisplayValue()!==x)a.getRange(1,i+1).setValue(x)});if(a.getLastRow()>1){const r=a.getRange(2,7,a.getLastRow()-1,1),v=r.getValues();let ch=false;v.forEach(x=>{if(x[0]===''||x[0]===null){x[0]=DEFAULT_MILES;ch=true}});if(ch)r.setValues(v)}}return a}
+function hash_(v){return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,String(v),Utilities.Charset.UTF_8).map(b=>{const n=b<0?b+256:b;return('0'+n.toString(16)).slice(-2)}).join('')}
+function token_(){return Utilities.getUuid()+'-'+Utilities.getUuid()}
+function find_(u){const s=accounts_(),v=s.getDataRange().getValues(),w=String(u).toLowerCase();for(let i=1;i<v.length;i++)if(String(v[i][0]).toLowerCase()===w)return{sheet:s,row:i+1,values:v[i]};return null}
+function auth_(t){if(!t)return null;const s=accounts_(),v=s.getDataRange().getValues(),w=hash_(t),now=Date.now();for(let i=1;i<v.length;i++){const created=v[i][5]?new Date(v[i][5]).getTime():0;if(String(v[i][4]||'')===w&&created&&now-created<=SESSION_DAYS*86400000){if(v[i][6]===''||v[i][6]===null)s.getRange(i+1,7).setValue(DEFAULT_MILES);return{username:String(v[i][0]),row:i+1,sheet:s}}}return null}
+function miles_(a){const n=Number(a.sheet.getRange(a.row,7).getValue());return Number.isFinite(n)?Math.floor(n):DEFAULT_MILES}
+function setMiles_(a,n){const x=Math.floor(Number(n));a.sheet.getRange(a.row,7).setValue(x);return x}
+function register_(b){const u=String(b.username||'').trim(),p=String(b.password||'');if(!/^[A-Za-z0-9_-]{3,20}$/.test(u))throw new Error('Username must be 3–20 letters, numbers, _ or -.');if(p.length<6)throw new Error('Password must be at least 6 characters.');if(find_(u))throw new Error('That username is already taken.');const salt=Utilities.getUuid(),t=token_();accounts_().appendRow([u,hash_(salt+'|'+p),salt,new Date(),hash_(t),new Date(),DEFAULT_MILES]);return{ok:true,username:u,token:t,miles:DEFAULT_MILES}}
+function login_(b){const u=String(b.username||'').trim(),p=String(b.password||''),a=find_(u);if(!a||hash_(String(a.values[2])+'|'+p)!==String(a.values[1]))throw new Error('Incorrect username or password.');const t=token_();a.sheet.getRange(a.row,5,1,2).setValues([[hash_(t),new Date()]]);return{ok:true,username:String(a.values[0]),token:t,miles:miles_(a)}}
+function book_(b,a){if(!b.flight||!b.destination||!b.date)throw new Error('Missing booking information.');const name=String(b.name||'').trim().slice(0,40);if(!name)throw new Error('Passenger name is required.');const id='LUP-'+Utilities.getUuid().replace(/-/g,'').slice(0,6).toUpperCase();getSheet_().appendRow([id,new Date(),name,String(b.flight),String(b.destination),String(b.date),String(b.time||''),String(b.gate||''),String(b.passengers||''),Number(b.price)||0,a.username,'Confirmed']);const m=setMiles_(a,miles_(a)+500);return{ok:true,bookingId:id,miles:m,milesEarned:500}}
+function bookings_(u){const v=getSheet_().getDataRange().getDisplayValues(),r=[];for(let i=1;i<v.length;i++)if(String(v[i][10]||'').toLowerCase()===u.toLowerCase())r.push({bookingId:v[i][0],bookedAt:v[i][1],passenger:v[i][2],flight:v[i][3],destination:v[i][4],date:v[i][5],time:v[i][6],gate:v[i][7],passengers:v[i][8],fare:v[i][9],status:v[i][11]||'Confirmed'});return r.reverse()}
+function cancel_(b,a){const id=String(b.bookingId||'').trim(),s=getSheet_(),v=s.getDataRange().getDisplayValues();if(!id)throw new Error('Booking ID is required.');for(let i=1;i<v.length;i++)if(v[i][0]===id){if(String(v[i][10]).toLowerCase()!==a.username.toLowerCase())throw new Error('That booking does not belong to your account.');if((v[i][11]||'Confirmed')==='Cancelled')throw new Error('This booking is already cancelled.');s.getRange(i+1,12).setValue('Cancelled');return{ok:true,bookingId:id,status:'Cancelled'}}throw new Error('Booking not found.')}
+function changeMiles_(b,a){const d=Math.floor(Number(b.delta));if(!Number.isFinite(d)||d===0)throw new Error('Enter a non-zero number of miles.');return{ok:true,miles:setMiles_(a,miles_(a)+d)}}
+function redeem_(b,a){const c=Math.floor(Number(b.cost));if(!Number.isFinite(c)||c<=0)throw new Error('Invalid redemption amount.');const m=miles_(a);if(m<c)throw new Error('Not enough miles.');return{ok:true,miles:setMiles_(a,m-c),redeemed:c}}
+function doPost(e){try{const b=JSON.parse((e&&e.postData&&e.postData.contents)||'{}'),action=String(b.action||'book'),l=LockService.getScriptLock();l.waitLock(10000);try{if(action==='register')return json_(register_(b));if(action==='login')return json_(login_(b));const a=auth_(String(b.token||''));if(!a)return json_({ok:false,error:'Please log in before using this account feature.'});if(action==='book')return json_(book_(b,a));if(action==='myBookings')return json_({ok:true,username:a.username,miles:miles_(a),bookings:bookings_(a.username)});if(action==='miles')return json_(changeMiles_(b,a));if(action==='redeem')return json_(redeem_(b,a));if(action==='cancel')return json_(cancel_(b,a));return json_({ok:false,error:'Unknown action.'})}finally{l.releaseLock()}}catch(err){return json_({ok:false,error:String(err.message||err)})}}
+function doGet(e){try{if(String((e.parameter&&e.parameter.key)||'')!==ADMIN_KEY)return json_({ok:false,error:'Unauthorized.'});const v=getSheet_().getDataRange().getDisplayValues();return json_({ok:true,bookings:v.length>1?v.slice(1).reverse():[]})}catch(err){return json_({ok:false,error:String(err.message||err)})}}
