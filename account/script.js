@@ -1,4 +1,4 @@
-const API='https://script.google.com/macros/s/AKfycbxzs6RlsQifibE1HCJypNFefgCuKz0o3DDFNO7xglYKuPxhisFAz5w1Eizy_Etzj8Ieg/exec';
+const API='https://script.google.com/macros/s/AKfycbxzs6RlsQifibE1HCJypNFefgCuKz0o3DDFNO7xglYkKuPxhisFAz5w1Eizy_Etzj8Ieg/exec';
 const TOKEN_KEY='lupinAccountToken',USER_KEY='lupinAccountUsername';
 let mode='login';const $=id=>document.getElementById(id);
 async function api(body){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),cache:'no-store'});const text=await r.text();try{return JSON.parse(text)}catch(e){throw new Error('The account server returned an invalid response.')}}
