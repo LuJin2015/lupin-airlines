@@ -1,4 +1,4 @@
-const API='https://script.google.com/macros/s/AKfycbxzs6RlsQifibE1HCJypNFefgCuKz0o3DDFNO7xglYKuPxhisFAz5w1Eizy_Etzj8Ieg/exec';
+const API='https://script.google.com/macros/s/AKfycbxzs6RlsQifibE1HCJypNFefgCuKz0o3DDFNO7xglYkKuPxhisFAz5w1Eizy_Etzj8Ieg/exec';
 const TOKEN_KEY='lupinAccountToken',USER_KEY='lupinAccountUsername';
 let current=12;
 const $=id=>document.getElementById(id);
