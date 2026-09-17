@@ -1,7 +1,7 @@
 const SPREADSHEET_ID = '1CGWCDA_blvF_1D2OXnoB3Z6Kn_pMVuMahx8xU_nf8co';
 const SHEET_NAME = 'flights';
 const ACCOUNTS_SHEET_NAME = 'accounts';
-const ADMIN_KEY = 'CHANGE_THIS_ADMIN_KEY';
+const ADMIN_KEY = 'lupin-air-2026';
 const SESSION_DAYS = 30;
 const DEFAULT_MILES = 12;
 function json_(d){return ContentService.createTextOutput(JSON.stringify(d)).setMimeType(ContentService.MimeType.JSON)}
