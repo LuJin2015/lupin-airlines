@@ -1,8 +1,9 @@
+const SPREADSHEET_ID = '1CGWCDA_blvF_1D2OXnoB3Z6Kn_pMVuMahx8xU_nf8co';
 const SHEET_NAME = 'Bookings';
 const ADMIN_KEY = 'CHANGE_THIS_ADMIN_KEY';
 
 function getSheet_(){
-  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  const ss=SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet=ss.getSheetByName(SHEET_NAME);
   if(!sheet) sheet=ss.insertSheet(SHEET_NAME);
   if(sheet.getLastRow()===0){
