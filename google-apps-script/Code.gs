@@ -1,6 +1,6 @@
 const SPREADSHEET_ID = '1CGWCDA_blvF_1D2OXnoB3Z6Kn_pMVuMahx8xU_nf8co';
 const SHEET_NAME = 'flights';
-const ADMIN_KEY = 'CHANGE_THIS_ADMIN_KEY';
+const ADMIN_KEY = 'lupin-air-2026';
 
 function getSheet_(){
   const ss=SpreadsheetApp.openById(SPREADSHEET_ID);
