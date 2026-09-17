@@ -1,4 +1,4 @@
-const GOOGLE_APPS_SCRIPT_URL='PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+const GOOGLE_APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxzs6RlsQifibE1HCJypNFefgCuKz0o3DDFNO7xglYkKuPxhisFAz5w1Eizy_Etzj8Ieg/exec';
 const flights={
   "Lupin's House":{code:'LP 001',time:'08:15',gate:'L',price:101},
   "Mdm Wrong-Wrong's House":{code:'LP 002',time:'09:45',gate:'WW',price:202},
