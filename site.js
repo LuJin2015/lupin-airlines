@@ -5,6 +5,7 @@ const here=root[root.length-1]||'home';
 function base(){return location.pathname.includes('/home/')||location.pathname.includes('/flights/')||location.pathname.includes('/booking/')||location.pathname.includes('/account/')||location.pathname.includes('/miles/')||location.pathname.includes('/status/')||location.pathname.includes('/destinations/')||location.pathname.includes('/experience/')||location.pathname.includes('/baggage/')||location.pathname.includes('/about/')||location.pathname.includes('/fleet/')||location.pathname.includes('/cabins/')||location.pathname.includes('/careers/')||location.pathname.includes('/airport-map/')||location.pathname.includes('/contact/')?'../':''}
 const B=base();
 function make(tag,attrs,text){const e=document.createElement(tag);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,v));if(text!==undefined)e.textContent=text;return e}
+function addChromeStyles(){if(document.getElementById('lupin-chrome-styles'))return;const s=document.createElement('style');s.id='lupin-chrome-styles';s.textContent='.privacy-banner{display:flex;align-items:center;gap:14px;padding:10px 4vw;background:#111318;color:#fff;font:11px/1.4 system-ui,sans-serif}.privacy-banner strong{color:#d7ff3f;white-space:nowrap}.privacy-banner span{color:#d5d8de}.privacy-banner a{color:#fff;font-weight:800;white-space:nowrap}.live-clock{font-size:10px;font-weight:800;white-space:nowrap;color:#69707d}.account-button{min-width:38px;text-align:center;padding:10px 12px}@media(max-width:900px){.privacy-banner{align-items:flex-start;flex-wrap:wrap;padding:10px 5vw}.privacy-banner span{flex:1;min-width:220px}.live-clock{display:none}}';document.head.appendChild(s)}
 function renderBar(){
  const old=document.querySelector('.topbar');if(!old)return;
  old.innerHTML='';
@@ -26,5 +27,5 @@ function renderPrivacy(){
  if(p.href){const a=make('a',{href:B+p.href},p.linkText||'Learn more');bar.append(a)}
  document.body.prepend(bar);
 }
-document.addEventListener('DOMContentLoaded',()=>{renderBar();renderPrivacy()});
+document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy()});
 })();
