@@ -1,5 +1,24 @@
-document.addEventListener('DOMContentLoaded',()=>{
-const flights=[['LP 001','08:15'],['LP 002','09:45'],['LP 003','11:00'],['LP 004','12:30'],['LP 005','14:00'],['LP 006','16:20'],['LP 000','23:59'],['LP 404','09:00'],['LP 007','11:30'],['LP 314','14:20'],['LP 9001','23:59']];
+const apiBase=()=>String(window.LUPIN_CONFIG?.apiBase||'').replace(/\/$/,'');
 const countries=['Singapore','Japan','Australia','Canada','Iceland','France','Brazil','Norway','New Zealand','United Kingdom','Germany','South Korea','Italy','Spain','India','Mexico'];
-const airspaces=flights.map(()=>countries[Math.floor(Math.random()*countries.length)]);
-const tick=()=>{const now=new Date();document.querySelectorAll('.cards article').forEach((c,i)=>{const flight=flights[i];if(!flight)return;const [h,m]=flight[1].split(':').map(Number),d=new Date(now);d.setHours(h,m,0,0);const diff=d-now,totalSeconds=Math.abs(diff)/1000,minutes=Math.floor(totalSeconds/60),seconds=Math.floor(totalSeconds%60),milliseconds=now.getMilliseconds(),s=c.querySelector('strong');if(!s)return;if(diff>30*60*1000)s.textContent=`🟢 Scheduled · ${minutes}m ${String(seconds).padStart(2,'0')}s ${String(milliseconds).padStart(3,'0')}ms`;else if(diff>=0)s.textContent=`🟠 Boarding NOW · ${minutes}m ${String(seconds).padStart(2,'0')}s ${String(milliseconds).padStart(3,'0')}ms`;else s.textContent=`🔴 Flight is over ${airspaces[i]} airspace · ${minutes}m ${String(seconds).padStart(2,'0')}s ${String(milliseconds).padStart(3,'0')}ms ago`})};tick();setInterval(tick,50)})
+let flights=[];
+async function loadFlights(){
+  const r=await fetch(apiBase()+'/flights');
+  if(!r.ok)throw new Error('Could not load flight data.');
+  const d=await r.json();
+  flights=Array.isArray(d.flights)?d.flights:[];
+  const cards=document.getElementById('status-cards');
+  if(cards)cards.innerHTML=flights.map(f=>`<article data-flight="${f.flight}"><h2>${f.flight}</h2><p>${f.destination}</p><strong>Watching the clock...</strong></article>`).join('');
+}
+function tick(){
+  const now=new Date();
+  document.querySelectorAll('#status-cards article').forEach((c,i)=>{
+    const f=flights[i]; if(!f)return;
+    const [h,m]=f.departure.split(':').map(Number),d=new Date(now);d.setHours(h,m,0,0);
+    const diff=d-now,totalSeconds=Math.abs(diff)/1000,minutes=Math.floor(totalSeconds/60),seconds=Math.floor(totalSeconds%60),milliseconds=now.getMilliseconds(),s=c.querySelector('strong');
+    if(!s)return;
+    if(diff>30*60*1000)s.textContent=`🟢 Scheduled · ${minutes}m ${String(seconds).padStart(2,'0')}s ${String(milliseconds).padStart(3,'0')}ms`;
+    else if(diff>=0)s.textContent=`🟠 Boarding NOW · ${minutes}m ${String(seconds).padStart(2,'0')}s ${String(milliseconds).padStart(3,'0')}ms`;
+    else s.textContent=`🔴 Flight is over ${countries[i%countries.length]} airspace · ${minutes}m ${String(seconds).padStart(2,'0')}s ${String(milliseconds).padStart(3,'0')}ms ago`;
+  });
+}
+document.addEventListener('DOMContentLoaded',async()=>{try{await loadFlights();tick();setInterval(tick,50)}catch(e){const c=document.getElementById('status-cards');if(c)c.innerHTML='<p>⚠️ Flight data is temporarily unavailable.</p>'}});
