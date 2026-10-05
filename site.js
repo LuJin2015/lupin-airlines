@@ -27,5 +27,17 @@ function renderPrivacy(){
  if(p.href){const a=make('a',{href:B+p.href},p.linkText||'Learn more');bar.append(a)}
  document.body.prepend(bar);
 }
+window.LUPIN_LOCAL={
+ usersKey:'lupinUsers',
+ sessionKey:'lupinCurrentUser',
+ bookingsKey:'lupinBookings',
+ getUsers(){try{return JSON.parse(localStorage.getItem(this.usersKey)||'[]')}catch{return[]}},
+ saveUsers(v){localStorage.setItem(this.usersKey,JSON.stringify(v))},
+ current(){return localStorage.getItem(this.sessionKey)||''},
+ login(u){localStorage.setItem(this.sessionKey,u)},
+ logout(){localStorage.removeItem(this.sessionKey)},
+ bookings(){try{return JSON.parse(localStorage.getItem(this.bookingsKey)||'[]')}catch{return[]}},
+ saveBookings(v){localStorage.setItem(this.bookingsKey,JSON.stringify(v))}
+};
 document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy()});
 })();
