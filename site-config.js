@@ -1,5 +1,5 @@
 window.LUPIN_CONFIG={
- apiBase:'https://YOUR-LUPIN-DATA-API.example',
+ dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data',
  brand:{name:'LUPIN AIRLINES',logo:'https://img.pokemondb.net/artwork/scraggy.jpg',home:'home/'},
  topbar:{
   showClock:true,
