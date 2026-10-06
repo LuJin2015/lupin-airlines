@@ -1,22 +1,12 @@
 window.LUPIN_CONFIG={
- dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data',
- brand:{name:'LUPIN AIRLINES',logo:'https://img.pokemondb.net/artwork/scraggy.jpg',home:'home/'},
- topbar:{
-  showClock:true,
-  nav:[
-   ['Home','home/'],['Flights','flights/'],['Destinations','destinations/'],['Book','booking/'],
-   ['Experience','experience/'],['Baggage','baggage/'],['About','about/'],['Lupin Miles','miles/'],
-   ['Flight Status','status/'],['Our Fleet','fleet/'],['Cabins','cabins/'],['Careers','careers/'],
-   ['Airport Map','airport-map/'],['Contact','contact/']
-  ],
-  account:{label:'Account',href:'account/',icon:'👤'},
-  cta:{label:'Book now',href:'booking/',enabled:true}
+ cloud:{
+  repo:'LuJin2015/lupin-data',
+  dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
+  workflow:'lupin-airlines-cloud.yml',
+  clientId:'REPLACE_WITH_GITHUB_OAUTH_CLIENT_ID'
  },
- privacyBanner:{
-  enabled:true,
-  title:'Privacy update',
-  text:'Previous Lupin Airlines account data has been retired. New accounts and bookings are supported, and information needed to operate your account is stored securely.',
-  linkText:'Learn more',
-  href:'about/'
- }
+ dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
+ brand:{name:'LUPIN AIRLINES',logo:'https://img.pokemondb.net/artwork/scraggy.jpg',home:'home/'},
+ topbar:{showClock:true,nav:[['Home','home/'],['Flights','flights/'],['Destinations','destinations/'],['Book','booking/'],['Experience','experience/'],['Baggage','baggage/'],['About','about/'],['Lupin Miles','miles/'],['Flight Status','status/'],['Our Fleet','fleet/'],['Cabins','cabins/'],['Careers','careers/'],['Airport Map','airport-map/'],['Contact','contact/']],account:{label:'Account',href:'account/',icon:'👤'},cta:{label:'Book now',href:'booking/',enabled:true}},
+ privacyBanner:{enabled:true,title:'Cloud data update',text:'Lupin Airlines accounts, Lupin Miles, and bookings are stored in the shared GitHub cloud repository.',linkText:'Learn more',href:'about/'}
 };
