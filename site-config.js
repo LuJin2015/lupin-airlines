@@ -3,7 +3,7 @@ window.LUPIN_CONFIG={
   repo:'LuJin2015/lupin-data',
   dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
   workflow:'lupin-airlines-cloud.yml',
-  clientId:'REPLACE_WITH_GITHUB_OAUTH_CLIENT_ID'
+  clientId:'Ov23liCpLG4VL6jdpA2M'
  },
  dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
  brand:{name:'LUPIN AIRLINES',logo:'https://img.pokemondb.net/artwork/scraggy.jpg',home:'home/'},
