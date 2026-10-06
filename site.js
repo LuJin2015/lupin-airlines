@@ -27,17 +27,24 @@ function renderPrivacy(){
  if(p.href){const a=make('a',{href:B+p.href},p.linkText||'Learn more');bar.append(a)}
  document.body.prepend(bar);
 }
-window.LUPIN_LOCAL={
- usersKey:'lupinUsers',
- sessionKey:'lupinCurrentUser',
- bookingsKey:'lupinBookings',
- getUsers(){try{return JSON.parse(localStorage.getItem(this.usersKey)||'[]')}catch{return[]}},
- saveUsers(v){localStorage.setItem(this.usersKey,JSON.stringify(v))},
- current(){return localStorage.getItem(this.sessionKey)||''},
- login(u){localStorage.setItem(this.sessionKey,u)},
- logout(){localStorage.removeItem(this.sessionKey)},
- bookings(){try{return JSON.parse(localStorage.getItem(this.bookingsKey)||'[]')}catch{return[]}},
- saveBookings(v){localStorage.setItem(this.bookingsKey,JSON.stringify(v))}
-};
+const CLOUD={repo:C.cloud?.repo||'LuJin2015/lupin-data',dataBase:C.cloud?.dataBase||'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',workflow:C.cloud?.workflow||'lupin-airlines-cloud.yml',clientId:C.cloud?.clientId||'REPLACE_WITH_GITHUB_OAUTH_CLIENT_ID',tokenKey:'lupinGitHubToken',sessionKey:'lupinCurrentUser'};
+async function cloudRead(file){const r=await fetch(CLOUD.dataBase+'/'+file+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('Could not read cloud data: '+file);return r.json()}
+const cloudToken=()=>sessionStorage.getItem(CLOUD.tokenKey)||'';
+const cloudCurrent=()=>sessionStorage.getItem(CLOUD.sessionKey)||'';
+const cloudSetCurrent=u=>sessionStorage.setItem(CLOUD.sessionKey,u);
+const cloudLogout=()=>{sessionStorage.removeItem(CLOUD.sessionKey);sessionStorage.removeItem(CLOUD.tokenKey)};
+async function cloudHash(v){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function githubConnect(){if(CLOUD.clientId.startsWith('REPLACE_'))throw new Error('GitHub OAuth Client ID has not been configured yet.');const r=await fetch('https://github.com/login/device/code',{method:'POST',headers:{Accept:'application/json'},body:new URLSearchParams({client_id:CLOUD.clientId,scope:'repo'})});if(!r.ok)throw new Error('Could not start GitHub authorization.');const d=await r.json();window.open(d.verification_uri||'https://github.com/login/device','_blank','noopener');alert('Enter GitHub code '+d.user_code+' in the new GitHub window, then return here.');let wait=(Number(d.interval)||5)*1000,end=Date.now()+(Number(d.expires_in)||900)*1000;while(Date.now()<end){await new Promise(x=>setTimeout(x,wait));const q=await fetch('https://github.com/login/oauth/access_token',{method:'POST',headers:{Accept:'application/json'},body:new URLSearchParams({client_id:CLOUD.clientId,device_code:d.device_code,grant_type:'urn:ietf:params:oauth:grant-type:device_code'})});const x=await q.json();if(x.access_token){sessionStorage.setItem(CLOUD.tokenKey,x.access_token);return x.access_token}if(x.error==='access_denied'||x.error==='expired_token')throw new Error('GitHub authorization was not completed.');if(x.error==='slow_down')wait+=5000}throw new Error('GitHub authorization timed out.')}
+async function cloudTokenOrConnect(){return cloudToken()||githubConnect()}
+async function cloudDispatch(operation,payload){const t=await cloudTokenOrConnect();const r=await fetch('https://api.github.com/repos/'+CLOUD.repo+'/actions/workflows/'+CLOUD.workflow+'/dispatches',{method:'POST',headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+t,'X-GitHub-Api-Version':'2026-03-10','Content-Type':'application/json'},body:JSON.stringify({ref:'main',inputs:{operation,payload:JSON.stringify(payload)}})});if(r.status===401){sessionStorage.removeItem(CLOUD.tokenKey);throw new Error('GitHub authorization expired.');}if(r.status===403)throw new Error('Your GitHub account needs write access to '+CLOUD.repo+'.');if(!r.ok)throw new Error('GitHub could not start the cloud update ('+r.status+').')}
+async function cloudWait(test){const end=Date.now()+30000;while(Date.now()<end){try{if(await test())return true}catch{}await new Promise(x=>setTimeout(x,1500))}return false}
+async function cloudRegister(username,password){const accounts=await cloudRead('accounts.json');if(accounts.some(x=>x.username===username))throw new Error('That username is already in use.');const account={username,passwordHash:await cloudHash(password),miles:0,createdAt:new Date().toISOString()};await cloudDispatch('register',{username,account});if(!await cloudWait(async()=> (await cloudRead('accounts.json')).some(x=>x.username===username)))throw new Error('GitHub Actions did not finish the account update in time.');cloudSetCurrent(username)}
+async function cloudLogin(username,password){const accounts=await cloudRead('accounts.json'),a=accounts.find(x=>x.username===username);if(!a||a.passwordHash!==await cloudHash(password))throw new Error('Incorrect username or password.');cloudSetCurrent(username)}
+async function cloudAccount(){const u=cloudCurrent();if(!u)return null;return (await cloudRead('accounts.json')).find(x=>x.username===u)||null}
+async function cloudBookings(){const u=cloudCurrent();return u?(await cloudRead('bookings.json')).filter(x=>x.username===u):[]}
+async function cloudBook(booking){await cloudDispatch('book',{username:booking.username,booking});if(!await cloudWait(async()=> (await cloudRead('bookings.json')).some(x=>x.bookingId===booking.bookingId)))throw new Error('GitHub Actions did not finish the booking update in time.');return booking}
+async function cloudCancel(id){const u=cloudCurrent();await cloudDispatch('cancel',{username:u,bookingId:id});if(!await cloudWait(async()=> (await cloudRead('bookings.json')).some(x=>x.bookingId===id&&x.status==='Cancelled')))throw new Error('GitHub Actions did not finish the cancellation in time.')}
+window.LUPIN_CLOUD={CLOUD,read:cloudRead,current:cloudCurrent,logout:cloudLogout,githubConnect,register:cloudRegister,login:cloudLogin,account:cloudAccount,bookings:cloudBookings,book:cloudBook,cancel:cloudCancel,hashPassword:cloudHash};
+window.LUPIN_LOCAL=window.LUPIN_CLOUD;
 document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy()});
 })();
