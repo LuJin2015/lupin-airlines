@@ -2,7 +2,7 @@ window.LUPIN_CONFIG={
  cloud:{
   repo:'LuJin2015/lupin-data',
   dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
-  apiBase:'REPLACE_WITH_CLOUDFLARE_WORKER_URL',
+  apiBase:'https://lupin-data-api.lujinsg.workers.dev',
   airline:'lupin-airlines'
  },
  dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
