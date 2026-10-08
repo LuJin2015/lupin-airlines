@@ -2,8 +2,8 @@ window.LUPIN_CONFIG={
  cloud:{
   repo:'LuJin2015/lupin-data',
   dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
-  workflow:'lupin-airlines-cloud.yml',
-  clientId:'Ov23liCpLG4VL6jdpA2M'
+  apiBase:'REPLACE_WITH_CLOUDFLARE_WORKER_URL',
+  airline:'lupin-airlines'
  },
  dataBase:'https://raw.githubusercontent.com/LuJin2015/lupin-data/main/data/lupin-airlines',
  brand:{name:'LUPIN AIRLINES',logo:'https://img.pokemondb.net/artwork/scraggy.jpg',home:'home/'},
