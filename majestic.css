@@ -24,8 +24,8 @@ header.topbar .account-button,.topbar .account-button{min-width:40px;padding:10p
 .hero,.page-hero{position:relative;isolation:isolate;overflow:hidden;color:var(--lupin-pearl);background:radial-gradient(ellipse at 82% 25%,rgba(216,189,123,.17),transparent 30rem),radial-gradient(ellipse at 8% 100%,rgba(80,126,161,.20),transparent 28rem),linear-gradient(125deg,#09162b 0%,#112641 58%,#182d48 100%)!important;border-bottom:1px solid rgba(216,189,123,.4)}
 .hero:after,.page-hero:after{content:"";position:absolute;z-index:0;pointer-events:none;width:min(48vw,660px);height:min(48vw,660px);right:-14%;top:-40%;border:1px solid rgba(216,189,123,.22);border-radius:50%;box-shadow:0 0 0 38px rgba(216,189,123,.035),0 0 0 78px rgba(216,189,123,.025)}
 .hero>*,.page-hero>*{position:relative;z-index:1}
-.hero h1,.page-hero h1,h1{font-weight:600;color:var(--lupin-pearl)}
-.hero h1 span,.page-hero h1 span,h1 span{color:var(--lupin-gold)!important}
+.hero h1,.page-hero h1{font-weight:600;color:var(--lupin-pearl)}h1{font-weight:600;color:var(--ink)}
+.hero h1 span,.page-hero h1 span{color:var(--lupin-gold)!important}
 .hero .lead,.page-hero .lead{color:#d4dbe6}
 .hero .eyebrow,.page-hero .eyebrow,.eyebrow{color:var(--lupin-gold)!important;letter-spacing:.2em}
 .hero .secondary,.page-hero .secondary,.secondary{border:1px solid rgba(216,189,123,.7);color:var(--lupin-pearl);background:rgba(255,255,255,.035);border-radius:999px}
