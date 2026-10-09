@@ -1,0 +1,20 @@
+/* Longer editorial sections for Lupin Airlines */
+.longform-section{padding:clamp(54px,8vw,108px) clamp(22px,7vw,100px);background:linear-gradient(180deg,#f8f4ea 0%,#f0e8d8 100%);border-top:1px solid #e1d4b8;border-bottom:1px solid #e1d4b8}
+.longform-section:nth-of-type(even){background:#fffdf7}
+.longform-heading{max-width:760px;margin:0 auto 34px;text-align:center}
+.longform-heading .eyebrow{color:#9a7a3b!important;font-size:11px;font-weight:900;letter-spacing:.2em}
+.longform-heading h2{margin:10px 0 14px;font-size:clamp(32px,4.4vw,58px);line-height:1.04;color:#0b1930}
+.longform-heading>p:last-child{max-width:640px;margin:0 auto;color:#6b7689;line-height:1.8}
+.longform-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1180px;margin:0 auto}
+.longform-card{min-height:190px;padding:clamp(22px,2.8vw,34px);background:#fffdf7;border:1px solid #e1d4b8;border-radius:18px;box-shadow:0 12px 34px rgba(14,28,48,.045)}
+.longform-number{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#10203a;color:#d8bd7b;font-size:12px;font-weight:900;letter-spacing:.08em}
+.longform-card h3{margin:22px 0 10px;font-size:24px;line-height:1.15;color:#0b1930}
+.longform-card p{margin:0;color:#6b7689;line-height:1.75;font-size:14px}
+.longform-band{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:1180px;margin:26px auto 0;padding:clamp(24px,4vw,42px);border-radius:20px;background:linear-gradient(120deg,#09162b,#172e4b);border:1px solid rgba(216,189,123,.45);color:#f8f3e8}
+.longform-band>div{max-width:700px}
+.longform-band .eyebrow{color:#d8bd7b!important;font-size:10px;font-weight:900;letter-spacing:.2em}
+.longform-band h3{margin:8px 0 10px;color:#f8f3e8;font-family:Georgia,serif;font-size:clamp(24px,3vw,36px);line-height:1.12}
+.longform-band p:last-child{margin:0;color:#cbd3df;line-height:1.75}
+.longform-band .primary{flex-shrink:0;text-decoration:none;white-space:nowrap;padding:13px 19px;border-radius:999px}
+@media(max-width:800px){.longform-grid{grid-template-columns:1fr}.longform-card{min-height:0}.longform-band{align-items:flex-start;flex-direction:column}.longform-section{padding:56px 6vw}}
+@media(prefers-reduced-motion:no-preference){.longform-card{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}.longform-card:hover{transform:translateY(-4px);box-shadow:0 18px 38px rgba(14,28,48,.09);border-color:#c5a96d}}
