@@ -1,0 +1,84 @@
+/* LUPIN AIRLINES — MAJESTIC DESIGN SYSTEM
+   Shared visual layer; it does not replace page markup or application logic. */
+:root{--ink:#0b1930;--muted:#6b7689;--paper:#f4f0e6;--card:#fffdf7;--accent:#d8bd7b;--line:#e1d4b8;--lupin-night:#09162b;--lupin-blue:#122743;--lupin-gold:#d8bd7b;--lupin-pearl:#f8f3e8;color-scheme:light}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{background:radial-gradient(ellipse at 90% 0%,rgba(216,189,123,.10),transparent 30rem),var(--paper);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+h1,h2,h3,.home-links h2,.feature-grid h3{font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;letter-spacing:-.035em}
+p{line-height:1.72}
+a{transition:color .2s ease}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(216,189,123,.85);outline-offset:3px}
+/* Midnight header, champagne trim */
+header.topbar,.topbar{background:rgba(9,22,43,.97)!important;color:var(--lupin-pearl)!important;border-bottom:1px solid rgba(216,189,123,.65)!important;box-shadow:0 8px 30px rgba(9,22,43,.12);backdrop-filter:blur(18px)}
+header.topbar a,.topbar a,.topbar .brand,.topbar nav a{color:var(--lupin-pearl)!important}
+header.topbar .brand,.topbar .brand{font-weight:900;letter-spacing:.07em;text-transform:uppercase;font-size:12px}
+header.topbar .logo,.topbar .logo{border:1px solid var(--lupin-gold);border-radius:50%;padding:2px;background:#fffdf7;object-fit:cover;flex-shrink:0}
+header.topbar nav[aria-label="Primary"],.topbar nav[aria-label="Primary"]{display:flex;flex:1 1 auto;min-width:0;flex-wrap:nowrap!important;justify-content:flex-start;gap:clamp(10px,1.25vw,19px);overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:rgba(216,189,123,.55) transparent;padding:7px 3px 9px}
+header.topbar nav a,.topbar nav a{position:relative;font-size:11px;font-weight:700;text-decoration:none!important;opacity:.86;transition:opacity .2s ease,color .2s ease}
+header.topbar nav a:hover,.topbar nav a:hover,header.topbar nav a.active,.topbar nav a.active{opacity:1;color:var(--lupin-gold)!important}
+header.topbar nav a:after,.topbar nav a:after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--lupin-gold);transform:scaleX(0);transform-origin:left;transition:transform .22s ease}
+header.topbar nav a:hover:after,.topbar nav a:hover:after,header.topbar nav a.active:after,.topbar nav a.active:after{transform:scaleX(1)}
+header.topbar .nav-button,.topbar .nav-button{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ead7a5,var(--lupin-gold))!important;color:#101d32!important;border:1px solid #f3e7c9;border-radius:999px;padding:11px 17px;font-size:11px;font-weight:900;letter-spacing:.04em;box-shadow:0 5px 16px rgba(216,189,123,.12);flex-shrink:0}
+header.topbar .nav-button:hover,.topbar .nav-button:hover{color:#101d32!important;transform:translateY(-2px);box-shadow:0 9px 24px rgba(216,189,123,.25)}
+header.topbar .account-button,.topbar .account-button{min-width:40px;padding:10px 12px}
+/* Cinematic hero panels */
+.hero,.page-hero{position:relative;isolation:isolate;overflow:hidden;color:var(--lupin-pearl);background:radial-gradient(ellipse at 82% 25%,rgba(216,189,123,.17),transparent 30rem),radial-gradient(ellipse at 8% 100%,rgba(80,126,161,.20),transparent 28rem),linear-gradient(125deg,#09162b 0%,#112641 58%,#182d48 100%)!important;border-bottom:1px solid rgba(216,189,123,.4)}
+.hero:after,.page-hero:after{content:"";position:absolute;z-index:0;pointer-events:none;width:min(48vw,660px);height:min(48vw,660px);right:-14%;top:-40%;border:1px solid rgba(216,189,123,.22);border-radius:50%;box-shadow:0 0 0 38px rgba(216,189,123,.035),0 0 0 78px rgba(216,189,123,.025)}
+.hero>*,.page-hero>*{position:relative;z-index:1}
+.hero h1,.page-hero h1,h1{font-weight:600;color:var(--lupin-pearl)}
+.hero h1 span,.page-hero h1 span,h1 span{color:var(--lupin-gold)!important}
+.hero .lead,.page-hero .lead{color:#d4dbe6}
+.hero .eyebrow,.page-hero .eyebrow,.eyebrow{color:var(--lupin-gold)!important;letter-spacing:.2em}
+.hero .secondary,.page-hero .secondary,.secondary{border:1px solid rgba(216,189,123,.7);color:var(--lupin-pearl);background:rgba(255,255,255,.035);border-radius:999px}
+.hero .secondary:hover,.secondary:hover{background:rgba(216,189,123,.10);border-color:var(--lupin-gold)}
+.hero .primary,.page-hero .primary,.primary,button.primary,button[type="submit"]{border:1px solid #f4e7c7!important;background:linear-gradient(135deg,#f0dfb0,#d1b16a)!important;color:#101d32!important;border-radius:999px!important;box-shadow:0 7px 20px rgba(216,189,123,.18);font-weight:900;transition:transform .22s ease,box-shadow .22s ease,filter .22s ease}
+.primary:hover,button.primary:hover,button[type="submit"]:hover{transform:translateY(-2px);box-shadow:0 13px 28px rgba(216,189,123,.28);filter:saturate(1.08)}
+.mascot-card{border:1px solid rgba(216,189,123,.5);box-shadow:0 28px 75px rgba(0,0,0,.28),inset 0 0 0 8px rgba(216,189,123,.025);background:radial-gradient(ellipse at 50% 35%,#20334a 0%,#101a2c 55%,#080f1c 100%)!important}
+.mascot-card .badge{background:var(--lupin-gold);color:var(--lupin-night);border:1px solid #f4e5bf}
+.orbit{border-color:rgba(216,189,123,.28)!important}
+/* Ivory surfaces with delicate gold borders */
+.home-links,.feature-grid,.route-grid{background:transparent!important;gap:18px!important}
+.home-links a,.feature-grid article,.route-grid article,.cards>article,.card,.search-card,.scraggy-panel,.about>div,.search-section,.booking-card,.booking,.incident-note{background:var(--card)!important;color:var(--ink)!important;border:1px solid var(--line)!important;border-radius:18px!important;box-shadow:0 12px 34px rgba(14,28,48,.055);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.home-links a,.feature-grid article,.route-grid article,.cards>article{padding:clamp(24px,3vw,42px)!important}
+.home-links a:hover,.feature-grid article:hover,.route-grid article:hover,.cards>article:hover,.card:hover,.booking:hover{transform:translateY(-4px);border-color:rgba(190,157,89,.7)!important;box-shadow:0 20px 42px rgba(14,28,48,.10)}
+.home-links h2,.feature-grid h3,.route-grid h3,.cards h2,.search-card h2{color:var(--ink)}
+.home-links span,.feature-grid article>b,.feature small,.cards small{color:#9a7a3b!important;letter-spacing:.12em}
+.home-links p,.feature-grid p,.route-grid p,.cards p,.muted,.hint{color:var(--muted)}
+.product-section{background:linear-gradient(180deg,#faf7ef,#f0e8d8)!important;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.product-section>h2{color:var(--ink)}
+.product-section .feature-grid{margin-top:10px}
+.mdm-remark,.quote,.remark{background:linear-gradient(130deg,#0a172b,#142a45)!important;color:var(--lupin-pearl)!important;border-top:1px solid rgba(216,189,123,.65)}
+.mdm-remark p,.quote p,.remark p{color:var(--lupin-pearl)}
+.mdm-remark span,.quote span,.mdm-remark strong,.quote strong,.remark strong{color:var(--lupin-gold)!important}
+.incident-note{background:rgba(255,255,255,.06)!important;color:var(--lupin-pearl)!important;border-color:rgba(216,189,123,.35)!important}
+footer{background:linear-gradient(110deg,#071326,#122640)!important;color:#f8f3e8!important;border-top:1px solid rgba(216,189,123,.65)}
+footer .legal,footer p{color:#bdc7d5}
+.footer-logo{border:1px solid var(--lupin-gold);border-radius:50%}
+/* Form surfaces */
+.search-card label,.card label,.wrap label{color:var(--ink)}
+input,select,textarea{background:#fffdf7!important;color:var(--ink)!important;border:1px solid #d9cba9!important;border-radius:11px!important;box-shadow:inset 0 1px 2px rgba(15,25,40,.025)}
+input::placeholder,textarea::placeholder{color:#8a92a0}
+input:focus,select:focus,textarea:focus{border-color:#b99855!important;box-shadow:0 0 0 3px rgba(216,189,123,.18)!important;outline:none}
+button:not(.secondary):not(.cancel){background:linear-gradient(135deg,#e9d5a0,#d2b16b);color:#10203a;border:1px solid #d7bd80;border-radius:999px;font-weight:850;transition:transform .2s ease,box-shadow .2s ease}
+button:not(.secondary):not(.cancel):hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(30,35,45,.12)}
+.tabs button:not(.active){background:#eee7d8!important;color:#18243a!important;border:1px solid #d8c9a7!important}
+.tabs button.active{background:#10203a!important;color:#f8f3e8!important}
+button.secondary{background:#eee7d8;color:#18243a;border:1px solid #d8c9a7}
+.cancel{border-radius:999px!important}
+.privacy-banner{background:#071326!important;border-bottom:1px solid rgba(216,189,123,.45);color:#ece5d5!important}
+.privacy-banner strong{color:var(--lupin-gold)!important}
+.privacy-banner span{color:#cbd3df!important}
+.privacy-banner a{color:var(--lupin-gold)!important}
+table{border-collapse:separate;border-spacing:0}
+th{color:#9a7a3b}
+td,th{border-color:#e5dcc9!important}
+hr{border:0;border-top:1px solid var(--line)}
+@media(max-width:900px){
+ .hero,.page-hero{background-position:center}
+ .hero:after,.page-hero:after{width:76vw;height:76vw;right:-32%;top:-15%}
+ header.topbar,.topbar{gap:12px}
+ header.topbar nav[aria-label="Primary"],.topbar nav[aria-label="Primary"]{max-width:100%;flex-basis:100%;order:3}
+ .home-links,.feature-grid,.route-grid{grid-template-columns:1fr!important}
+ .home-links a,.feature-grid article,.route-grid article,.cards>article{padding:26px!important}
+ .mdm-remark,.quote,.remark{padding:52px 7vw}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
