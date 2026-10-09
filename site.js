@@ -36,14 +36,10 @@ function renderBar(){
   const a=make('a',{class:'nav-button account-button',href:url(account.href),title:account.label||'Account','aria-label':account.label||'Account'});
   a.textContent=account.icon||account.label||'Account';
   if(new URL(a.href).pathname.replace(/\/+$/,'/')===currentPath)a.classList.add('active');
-  old.append(a);
+  old.append(a)
  }
  const cta=C.topbar?.cta;
- if(cta?.enabled){
-  const a=make('a',{class:'nav-button',href:url(cta.href)});
-  a.textContent=cta.label||'Book now';
-  old.append(a);
- }
+ if(cta?.enabled){const a=make('a',{class:'nav-button',href:url(cta.href)});a.textContent=cta.label||'Book now';old.append(a)}
 }
 function renderPrivacy(){
  const p=C.privacyBanner;
@@ -51,7 +47,55 @@ function renderPrivacy(){
  const bar=make('div',{class:'privacy-banner'});
  bar.append(make('strong',{},p.title||''),make('span',{},p.text||''));
  if(p.href)bar.append(make('a',{href:url(p.href)},p.linkText||'Learn more'));
- document.body.prepend(bar);
+ document.body.prepend(bar)
 }
-document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy()});
+function addScrollAnimations(){
+ if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ if(document.getElementById('lupin-scroll-styles'))return;
+ const styles=make('style',{id:'lupin-scroll-styles'});
+ styles.textContent='.lupin-reveal{opacity:0;transform:translate3d(0,26px,0);transition:opacity .72s cubic-bezier(.2,.7,.2,1),transform .72s cubic-bezier(.2,.7,.2,1);transition-delay:var(--lupin-reveal-delay,0ms);will-change:opacity,transform}.lupin-reveal.lupin-visible{opacity:1;transform:translate3d(0,0,0)}.lupin-parallax{transform:translate3d(0,var(--lupin-parallax-y,0px),0);will-change:transform}@media(prefers-reduced-motion:reduce){.lupin-reveal,.lupin-reveal.lupin-visible,.lupin-parallax{opacity:1;transform:none;transition:none;will-change:auto}}';
+ document.head.appendChild(styles);
+ const selectors=['main > section','main > .wrap','main > .card','main > .cards','main > .search-card','.home-links > a','.feature-grid > article','.cards > article','.route-grid > article','.feature-grid > .feature','.product-section > .eyebrow','.product-section > h2','.mascot-card','.remark','.mdm-remark','body > footer','main article'];
+ const found=new Set();
+ selectors.forEach(selector=>document.querySelectorAll(selector).forEach(el=>found.add(el)));
+ const revealTargets=Array.from(found).filter(el=>!el.closest('.topbar,.privacy-banner'));
+ const groupCounters=new Map();
+ revealTargets.forEach(el=>{
+  if(el.classList.contains('lupin-reveal'))return;
+  el.classList.add('lupin-reveal');
+  const parent=el.parentElement;
+  const selector=el.matches('.home-links > a')?'.home-links':el.matches('.feature-grid > article')?'.feature-grid':el.matches('.cards > article')?'.cards':el.matches('.route-grid > article')?'.route-grid':null;
+  if(selector){
+   const group=parent||document;
+   const idx=groupCounters.get(group)||0;
+   groupCounters.set(group,idx+1);
+   el.style.setProperty('--lupin-reveal-delay',Math.min(idx,5)*90+'ms')
+  }
+ });
+ const all=Array.from(document.querySelectorAll('.lupin-reveal'));
+ if(!('IntersectionObserver'in window)){all.forEach(el=>el.classList.add('lupin-visible'));return}
+ const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('lupin-visible');observer.unobserve(entry.target)}});
+ },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+ all.forEach(el=>observer.observe(el));
+ const parallax=Array.from(document.querySelectorAll('.mascot-card .mascot, main .hero img:not(.logo)'));
+ if(parallax.length){
+  parallax.forEach(el=>el.classList.add('lupin-parallax'));
+  let pending=false;
+  const paint=()=>{
+   pending=false;
+   const vh=window.innerHeight||800;
+   parallax.forEach(el=>{
+    const rect=el.getBoundingClientRect();
+    const offset=(rect.top+rect.height/2-vh/2)/vh;
+    el.style.setProperty('--lupin-parallax-y',Math.max(-12,Math.min(12,-offset*12))+'px')
+   })
+  };
+  const requestPaint=()=>{if(!pending){pending=true;window.requestAnimationFrame(paint)}};
+  window.addEventListener('scroll',requestPaint,{passive:true});
+  window.addEventListener('resize',requestPaint);
+  paint()
+ }
+}
+document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy();addScrollAnimations()});
 })();
