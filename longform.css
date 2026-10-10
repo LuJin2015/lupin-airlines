@@ -1,20 +1,33 @@
-/* Longer editorial sections for Lupin Airlines */
-.longform-section{padding:clamp(54px,8vw,108px) clamp(22px,7vw,100px);background:linear-gradient(180deg,#f8f4ea 0%,#f0e8d8 100%);border-top:1px solid #e1d4b8;border-bottom:1px solid #e1d4b8}
-.longform-section:nth-of-type(even){background:#fffdf7}
+/* Lupin Airlines — modern long-form sections */
+.longform-section{
+  padding:clamp(54px,8vw,108px) clamp(22px,7vw,100px);
+  background:#f1f1eb;border-top:1px solid #deded7;border-bottom:1px solid #deded7
+}
+.longform-section:nth-of-type(even){background:#fff}
 .longform-heading{max-width:760px;margin:0 auto 34px;text-align:center}
-.longform-heading .eyebrow{color:#9a7a3b!important;font-size:11px;font-weight:900;letter-spacing:.2em}
-.longform-heading h2{margin:10px 0 14px;font-size:clamp(32px,4.4vw,58px);line-height:1.04;color:#0b1930}
-.longform-heading>p:last-child{max-width:640px;margin:0 auto;color:#6b7689;line-height:1.8}
+.longform-heading .eyebrow{color:#5e6c20!important;font-size:11px;font-weight:850;letter-spacing:.13em}
+.longform-heading h2{margin:10px 0 14px;font-family:inherit;font-size:clamp(32px,4.4vw,58px);font-weight:800;letter-spacing:-.06em;line-height:1.02;color:#111318}
+.longform-heading>p:last-child{max-width:640px;margin:0 auto;color:#69707d;line-height:1.75}
 .longform-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1180px;margin:0 auto}
-.longform-card{min-height:190px;padding:clamp(22px,2.8vw,34px);background:#fffdf7;border:1px solid #e1d4b8;border-radius:18px;box-shadow:0 12px 34px rgba(14,28,48,.045)}
-.longform-number{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#10203a;color:#d8bd7b;font-size:12px;font-weight:900;letter-spacing:.08em}
-.longform-card h3{margin:22px 0 10px;font-size:24px;line-height:1.15;color:#0b1930}
-.longform-card p{margin:0;color:#6b7689;line-height:1.75;font-size:14px}
-.longform-band{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:1180px;margin:26px auto 0;padding:clamp(24px,4vw,42px);border-radius:20px;background:linear-gradient(120deg,#09162b,#172e4b);border:1px solid rgba(216,189,123,.45);color:#f8f3e8}
+.longform-card{min-height:190px;padding:clamp(22px,2.8vw,34px);background:#fff;border:1px solid #deded7;border-radius:20px;box-shadow:0 8px 26px rgba(17,19,24,.035)}
+.longform-number{display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;background:#d7ff3f;color:#111318;font-size:12px;font-weight:900;letter-spacing:.02em}
+.longform-card h3{margin:22px 0 10px;font-family:inherit;font-size:24px;font-weight:750;letter-spacing:-.045em;line-height:1.15;color:#111318}
+.longform-card p{margin:0;color:#69707d;line-height:1.72;font-size:14px}
+.longform-band{display:flex;align-items:center;justify-content:space-between;gap:28px;max-width:1180px;margin:26px auto 0;padding:clamp(24px,4vw,42px);border-radius:22px;background:#111318;border:1px solid #111318;color:#f6f5f0}
 .longform-band>div{max-width:700px}
-.longform-band .eyebrow{color:#d8bd7b!important;font-size:10px;font-weight:900;letter-spacing:.2em}
-.longform-band h3{margin:8px 0 10px;color:#f8f3e8;font-family:Georgia,serif;font-size:clamp(24px,3vw,36px);line-height:1.12}
-.longform-band p:last-child{margin:0;color:#cbd3df;line-height:1.75}
-.longform-band .primary{flex-shrink:0;text-decoration:none;white-space:nowrap;padding:13px 19px;border-radius:999px}
-@media(max-width:800px){.longform-grid{grid-template-columns:1fr}.longform-card{min-height:0}.longform-band{align-items:flex-start;flex-direction:column}.longform-section{padding:56px 6vw}}
-@media(prefers-reduced-motion:no-preference){.longform-card{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}.longform-card:hover{transform:translateY(-4px);box-shadow:0 18px 38px rgba(14,28,48,.09);border-color:#c5a96d}}
+.longform-band .eyebrow{color:#d7ff3f!important;font-size:10px;font-weight:850;letter-spacing:.14em}
+.longform-band h3{margin:8px 0 10px;color:#fff;font-family:inherit;font-size:clamp(24px,3vw,36px);font-weight:800;letter-spacing:-.05em;line-height:1.12}
+.longform-band p:last-child{margin:0;color:#c4c8d0;line-height:1.72}
+.longform-band .primary{flex-shrink:0;text-decoration:none;white-space:nowrap;padding:13px 19px;border-radius:12px!important;background:#d7ff3f!important;color:#111318!important;border-color:#d7ff3f!important}
+.longform-band .primary:hover{background:#e2ff75!important;color:#111318!important}
+@media(max-width:800px){
+  .longform-grid{grid-template-columns:1fr}
+  .longform-card{min-height:0}
+  .longform-band{align-items:flex-start;flex-direction:column}
+  .longform-section{padding:56px 6vw}
+}
+@media(prefers-reduced-motion:no-preference){
+  .longform-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+  .longform-card:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(17,19,24,.08);border-color:#bfcf78}
+}
+@media(prefers-reduced-motion:reduce){.longform-card{transition:none}}
