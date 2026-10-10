@@ -97,5 +97,68 @@ function addScrollAnimations(){
   paint()
  }
 }
-document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy();addScrollAnimations()});
+function addMotionInteractions(){
+ const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!reduce){
+  document.querySelectorAll('.hero,.page-hero').forEach((hero,index)=>{
+   if(hero.querySelector('.lupin-flight-layer'))return;
+   const layer=make('div',{class:'lupin-flight-layer','aria-hidden':'true'});
+   layer.innerHTML='<svg viewBox="0 0 700 300" preserveAspectRatio="xMidYMid meet" focusable="false"><defs><linearGradient id="lupin-flight-gradient-'+index+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a7d51a" stop-opacity=".06"/><stop offset=".52" stop-color="#9cc81b" stop-opacity=".68"/><stop offset="1" stop-color="#d7ff3f" stop-opacity=".22"/></linearGradient></defs><path class="lupin-route-halo" d="M35 230 C145 20 230 270 380 150 S550 5 665 100"/><path class="lupin-route-path" d="M35 230 C145 20 230 270 380 150 S550 5 665 100"/><circle class="lupin-route-beacon" r="5"><animateMotion dur="12s" repeatCount="indefinite" path="M35 230 C145 20 230 270 380 150 S550 5 665 100"/></circle><g class="lupin-flight-plane"><path d="M-16 -5 L-2 -3 L5 -14 L9 -14 L7 -2 L17 2 L17 5 L5 4 L-1 13 L-5 13 L-3 4 L-16 1 Z"/><animateMotion dur="12s" repeatCount="indefinite" rotate="auto" path="M35 230 C145 20 230 270 380 150 S550 5 665 100"/></g><circle class="lupin-route-star" cx="505" cy="45" r="2"/><circle class="lupin-route-star" cx="600" cy="210" r="3"/></svg>';
+   hero.insertBefore(layer,hero.firstChild);
+  });
+ }
+ const fine=window.matchMedia&&window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+ if(fine&&!reduce){
+  const cards=document.querySelectorAll('.home-links>a,.feature-grid>article,.route-grid>article,.longform-card,.cards>article,.search-card,.booking-card,.card,.mascot-card');
+  cards.forEach(el=>{
+   if(el.matches('.mascot-card'))return;
+   el.classList.add('lupin-tilt-target');
+   el.addEventListener('pointerenter',()=>el.classList.add('lupin-tilt-active'));
+   el.addEventListener('pointermove',event=>{
+    const rect=el.getBoundingClientRect();
+    if(!rect.width||!rect.height)return;
+    const x=(event.clientX-rect.left)/rect.width;
+    const y=(event.clientY-rect.top)/rect.height;
+    el.style.setProperty('--lupin-tilt-x',((.5-y)*7).toFixed(2)+'deg');
+    el.style.setProperty('--lupin-tilt-y',((x-.5)*7).toFixed(2)+'deg');
+    el.style.setProperty('--lupin-glow-x',(x*100).toFixed(1)+'%');
+    el.style.setProperty('--lupin-glow-y',(y*100).toFixed(1)+'%');
+   });
+   el.addEventListener('pointerleave',()=>{
+    el.classList.remove('lupin-tilt-active');
+    el.style.removeProperty('--lupin-tilt-x');
+    el.style.removeProperty('--lupin-tilt-y');
+   });
+  });
+  const buttons=document.querySelectorAll('a.primary,.nav-button,button.primary,button[type="submit"]');
+  buttons.forEach(el=>{
+   if(el.closest('.longform-band'))return;
+   el.classList.add('lupin-magnetic');
+   el.addEventListener('pointermove',event=>{
+    const rect=el.getBoundingClientRect();
+    el.style.setProperty('--lupin-mag-x',(((event.clientX-rect.left)/rect.width-.5)*7).toFixed(1)+'px');
+    el.style.setProperty('--lupin-mag-y',(((event.clientY-rect.top)/rect.height-.5)*5).toFixed(1)+'px');
+   });
+   el.addEventListener('pointerleave',()=>{
+    el.style.removeProperty('--lupin-mag-x');
+    el.style.removeProperty('--lupin-mag-y');
+   });
+  });
+ }
+ document.addEventListener('pointerdown',event=>{
+  if(reduce)return;
+  const target=event.target.closest('a.primary,.nav-button,button.primary,button[type="submit"]');
+  if(!target||target.matches(':disabled'))return;
+  const rect=target.getBoundingClientRect();
+  const ripple=make('span',{class:'lupin-ripple','aria-hidden':'true'});
+  const size=Math.max(rect.width,rect.height)*1.5;
+  ripple.style.width=size+'px';ripple.style.height=size+'px';
+  ripple.style.left=(event.clientX-rect.left-size/2)+'px';
+  ripple.style.top=(event.clientY-rect.top-size/2)+'px';
+  target.querySelectorAll('.lupin-ripple').forEach(old=>old.remove());
+  target.appendChild(ripple);
+  ripple.addEventListener('animationend',()=>ripple.remove(),{once:true});
+ });
+}
+document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy();addScrollAnimations();addMotionInteractions()});
 })();
