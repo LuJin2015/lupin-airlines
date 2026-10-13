@@ -8,7 +8,7 @@
   const read=()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch{return null}};
   const shared=()=>{try{return JSON.parse(localStorage.getItem('lupinCloudAccount')||'null')}catch{return null}};
   const write=x=>{localStorage.setItem(SESSION_KEY,JSON.stringify(x));try{sessionStorage.setItem(SESSION_KEY,JSON.stringify(x))}catch{}};
-  const clear=()=>{localStorage.removeItem(SESSION_KEY);localStorage.removeItem('lupinCloudAccount');window.dispatchEvent(new CustomEvent('lupin-auth-change',{detail:null}));try{sessionStorage.removeItem(SESSION_KEY)}catch{}};
+  const clear=()=>{localStorage.removeItem(SESSION_KEY);window.dispatchEvent(new CustomEvent('lupin-auth-change',{detail:shared()||null}));try{sessionStorage.removeItem(SESSION_KEY)}catch{}};
   async function api(path,options={}){
     const headers=Object.assign({'Content-Type':'application/json'},options.headers||{});
     const s=read(),cloud=shared(); if(s?.token) headers.Authorization='Bearer '+s.token; else if(cloud?.token) headers.Authorization='Bearer '+cloud.token;
