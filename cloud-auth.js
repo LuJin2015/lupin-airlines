@@ -6,11 +6,13 @@
   const AIRLINE=String(cfg.airline||'lupin-airlines');
   const SESSION_KEY='lupinCloudSession';
   const read=()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch{return null}};
+  const shared=()=>{try{return JSON.parse(localStorage.getItem('lupinCloudAccount')||'null')}catch{return null}};
   const write=x=>{localStorage.setItem(SESSION_KEY,JSON.stringify(x));try{sessionStorage.setItem(SESSION_KEY,JSON.stringify(x))}catch{}};
   const clear=()=>{localStorage.removeItem(SESSION_KEY);try{sessionStorage.removeItem(SESSION_KEY)}catch{}};
   async function api(path,options={}){
     const headers=Object.assign({'Content-Type':'application/json'},options.headers||{});
-    const s=read(); if(s?.token) headers.Authorization='Bearer '+s.token;
+    const s=read(),cloud=shared(); if(s?.token) headers.Authorization='Bearer '+s.token; else if(cloud?.token) headers.Authorization='Bearer '+cloud.token;
+    if(cloud?.token) headers['X-Lupin-Cloud-Token']=cloud.token;
     let r;
     try{r=await fetch(API_BASE+'/api/'+encodeURIComponent(AIRLINE)+path,Object.assign({},options,{headers,cache:'no-store'}));}
     catch(e){const x=new Error('Could not reach the Lupin cloud. Check your connection and try again.');x.code='NETWORK';throw x;}
@@ -44,6 +46,7 @@
     try{d=await api('/register',{method:'POST',body:JSON.stringify({username,password})})}
     catch(e){if(e.status===409)d=await api('/login',{method:'POST',body:JSON.stringify({username,password})});else throw e}
     write({username:d.username,miles:Number(d.miles||0),token:d.token,cloudUser:identity.user});
+    await api('/link',{method:'POST',body:'{}'});
     return {...d,cloudUser:identity.user};
   }
   async function login(username,password){
@@ -55,10 +58,11 @@
     try{identity=await ensureShared(username,password,'login')}
     catch(e){clear();throw e}
     write({username:d.username,miles:Number(d.miles||0),token:d.token,cloudUser:identity.user});
+    await api('/link',{method:'POST',body:'{}'});
     return {...d,cloudUser:identity.user};
   }
-  async function account(){if(!read())return null;try{return await api('/me')}catch(e){if(e.status===401)clear();throw e}}
-  async function bookings(){if(!read())return [];return (await api('/bookings')).bookings||[]}
+  async function account(){if(!read()?.token&&!shared()?.token)return null;try{return await api('/me')}catch(e){if(e.status===401&&read()?.token){clear();if(shared()?.token)return await api('/me')}throw e}}
+  async function bookings(){if(!read()?.token&&!shared()?.token)return [];return (await api('/bookings')).bookings||[]}
   async function book(data){return api('/bookings',{method:'POST',body:JSON.stringify(data)})}
   async function cancel(id){return api('/bookings/'+encodeURIComponent(id)+'/cancel',{method:'POST'})}
   async function flights(){return (await api('/flights')).flights||[]}
