@@ -46,7 +46,7 @@
     try{d=await api('/register',{method:'POST',body:JSON.stringify({username,password})})}
     catch(e){if(e.status===409)d=await api('/login',{method:'POST',body:JSON.stringify({username,password})});else throw e}
     write({username:d.username,miles:Number(d.miles||0),token:d.token,cloudUser:identity.user});
-    await api('/link',{method:'POST',body:'{}'});
+    await api('/link',{method:'POST',body:JSON.stringify({username,password})});
     return {...d,cloudUser:identity.user};
   }
   async function login(username,password){
