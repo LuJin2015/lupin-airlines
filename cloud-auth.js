@@ -18,8 +18,45 @@
     if(!r.ok){const e=new Error(d.error||'Cloud API error ('+r.status+').');e.status=r.status;throw e;}
     return d;
   }
-  async function register(username,password){const d=await api('/register',{method:'POST',body:JSON.stringify({username,password})});write({username:d.username,miles:Number(d.miles||0),token:d.token});return d}
-  async function login(username,password){const d=await api('/login',{method:'POST',body:JSON.stringify({username,password})});write({username:d.username,miles:Number(d.miles||0),token:d.token});return d}
+  const AUTH_BASE=API_BASE+'/api/auth';
+  async function sharedAuth(action,username,password){
+    const response=await fetch(AUTH_BASE+'/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password}),cache:'no-store'});
+    let data={};try{data=await response.json()}catch{}
+    if(!response.ok){const e=new Error(data.error||'Lupin Cloud account error ('+response.status+').');e.status=response.status;throw e}
+    localStorage.setItem('lupinCloudAccount',JSON.stringify({token:data.token,user:data.user,expiresAt:data.expiresAt}));
+    window.dispatchEvent(new CustomEvent('lupin-auth-change',{detail:{token:data.token,user:data.user,expiresAt:data.expiresAt}}));
+    return data;
+  }
+  async function ensureShared(username,password,preferred){
+    try{return await sharedAuth(preferred,username,password)}
+    catch(e){
+      if(preferred==='login'&&e.status===401){
+        // Existing airline-only accounts are upgraded after their airline password is verified.
+        return await sharedAuth('register',username,password);
+      }
+      if(preferred==='register'&&e.status===409)return await sharedAuth('login',username,password);
+      throw e;
+    }
+  }
+  async function register(username,password){
+    const identity=await ensureShared(username,password,'register');
+    let d;
+    try{d=await api('/register',{method:'POST',body:JSON.stringify({username,password})})}
+    catch(e){if(e.status===409)d=await api('/login',{method:'POST',body:JSON.stringify({username,password})});else throw e}
+    write({username:d.username,miles:Number(d.miles||0),token:d.token,cloudUser:identity.user});
+    return {...d,cloudUser:identity.user};
+  }
+  async function login(username,password){
+    // Validate against the airline account first for legacy-account migration.
+    let d;
+    try{d=await api('/login',{method:'POST',body:JSON.stringify({username,password})})}
+    catch(e){throw e}
+    let identity;
+    try{identity=await ensureShared(username,password,'login')}
+    catch(e){clear();throw e}
+    write({username:d.username,miles:Number(d.miles||0),token:d.token,cloudUser:identity.user});
+    return {...d,cloudUser:identity.user};
+  }
   async function account(){if(!read())return null;try{return await api('/me')}catch(e){if(e.status===401)clear();throw e}}
   async function bookings(){if(!read())return [];return (await api('/bookings')).bookings||[]}
   async function book(data){return api('/bookings',{method:'POST',body:JSON.stringify(data)})}
