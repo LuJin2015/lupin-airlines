@@ -13,7 +13,8 @@ function ensureCloud(){
   async function book(data){return api('/bookings',{method:'POST',body:JSON.stringify(data)})}
   async function cancel(id){return api('/bookings/'+encodeURIComponent(id)+'/cancel',{method:'POST'})}
   async function flights(){return (await api('/flights')).flights||[]}
-  return window.LUPIN_CLOUD={apiBase,airline,current:()=>read()?.username||'',session:read,logout:clear,login,register,account,bookings,book,cancel,flights};
+  async function seatMap(flight,date){return api('/seats?flight='+encodeURIComponent(flight)+'&date='+encodeURIComponent(date))}
+  return window.LUPIN_CLOUD={apiBase,airline,current:()=>read()?.username||'',session:read,logout:clear,login,register,account,bookings,book,cancel,flights,seatMap};
 }
 const cloud=ensureCloud();
 function showMode(next){mode=next;$('loginTab').classList.toggle('active',mode==='login');$('registerTab').classList.toggle('active',mode==='register');$('authButton').textContent=mode==='login'?'Log in':'Create account';$('authStatus').textContent=''}
