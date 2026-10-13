@@ -177,7 +177,7 @@ function addEasterEggs(){
   hideTimer=setTimeout(()=>toast&&toast.classList.remove('show'),6500);
  }
  let mascotClicks=0,mascotTimer;
- document.querySelectorAll('.mascot,.logo,.footer-logo').forEach(el=>{
+ document.querySelectorAll('.mascot,.footer-logo').forEach(el=>{
   el.classList.add('lupin-secret-mascot');
   el.setAttribute('tabindex','0');
   el.setAttribute('role','button');
