@@ -26,5 +26,5 @@
   async function cancel(id){return api('/bookings/'+encodeURIComponent(id)+'/cancel',{method:'POST'})}
   async function flights(){return (await api('/flights')).flights||[]}
   async function seatMap(flight,date){return api('/seats?flight='+encodeURIComponent(flight)+'&date='+encodeURIComponent(date))}
-  window.LUPIN_CLOUD={apiBase:API_BASE,airline:AIRLINE,current:()=>read()?.username||'',session:read,logout:clear,register,login,account,bookings,book,cancel,flights,seatMap};
+  window.LUPIN_CLOUD={apiBase:API_BASE,airline:AIRLINE,api,current:()=>read()?.username||'',session:read,logout:clear,register,login,account,bookings,book,cancel,flights,seatMap};
 })();
