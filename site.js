@@ -160,5 +160,68 @@ function addMotionInteractions(){
   ripple.addEventListener('animationend',()=>ripple.remove(),{once:true});
  });
 }
-document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy();addScrollAnimations();addMotionInteractions()});
+
+function addEasterEggs(){
+ const css=make('style',{id:'lupin-easter-egg-styles'});
+ css.textContent='#lupin-secret-toast{position:fixed;right:22px;bottom:22px;z-index:99999;max-width:min(390px,calc(100vw - 32px));padding:18px 20px;background:#111318;color:#fff;border:1px solid #d7ff3f;border-radius:16px;box-shadow:0 18px 50px #0003;font:14px/1.5 system-ui,sans-serif;opacity:0;transform:translateY(12px);transition:opacity .22s,transform .22s}#lupin-secret-toast.show{opacity:1;transform:translateY(0)}#lupin-secret-toast strong{display:block;color:#d7ff3f;margin-bottom:4px}#lupin-secret-toast button{margin:10px 0 0 8px;padding:6px 10px;border:1px solid #ffffff50;border-radius:8px;background:#ffffff12;color:#fff;cursor:pointer}#lupin-secret-toast .egg-close{float:right;margin:0 0 4px 12px}.lupin-secret-mascot{cursor:pointer}.lupin-secret-mascot:focus-visible{outline:3px solid #d7ff3f;outline-offset:4px}';
+ document.head.appendChild(css);
+ let toast,hideTimer;
+ function show(title,message){
+  if(!toast){toast=make('aside',{id:'lupin-secret-toast','role':'status','aria-live':'polite'});document.body.appendChild(toast)}
+  toast.innerHTML='';
+  const close=make('button',{class:'egg-close','aria-label':'Dismiss easter egg'},'×');
+  close.addEventListener('click',()=>toast.classList.remove('show'));
+  toast.append(close,make('strong',{},title),make('span',{},message));
+  toast.classList.add('show');
+  clearTimeout(hideTimer);
+  hideTimer=setTimeout(()=>toast&&toast.classList.remove('show'),6500);
+ }
+ let mascotClicks=0,mascotTimer;
+ document.querySelectorAll('.mascot,.logo,.footer-logo').forEach(el=>{
+  el.classList.add('lupin-secret-mascot');
+  el.setAttribute('tabindex','0');
+  el.setAttribute('role','button');
+  el.setAttribute('aria-label','Scraggy — secret airline controls');
+  const click=()=>{
+   mascotClicks++;
+   clearTimeout(mascotTimer);
+   mascotTimer=setTimeout(()=>mascotClicks=0,1800);
+   if(mascotClicks>=5){
+    mascotClicks=0;
+    show('SCRAGGY OVERRIDE ACTIVATED','CEO status confirmed. Pants inspection postponed. Mdm Wrong-Wrong has been notified (probably).');
+   }
+  };
+  el.addEventListener('click',click);
+  el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();click()}});
+ });
+ const konami=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+ let seq=[];
+ document.addEventListener('keydown',event=>{
+  if(event.ctrlKey||event.metaKey||event.altKey)return;
+  seq.push(event.key.length===1?event.key.toLowerCase():event.key);
+  seq=seq.slice(-konami.length);
+  if(seq.length===konami.length&&konami.every((key,i)=>key===seq[i])){
+   seq=[];
+   show('KONAMI FLIGHT PLAN UNLOCKED','You found the secret route: Somewhere Worst → Somewhere Even Worse → The Moon. No refunds in this dimension.');
+  }
+ });
+ let typed='';
+ document.addEventListener('keydown',event=>{
+  if(event.ctrlKey||event.metaKey||event.altKey||event.key.length!==1)return;
+  const tag=(event.target&&event.target.tagName||'').toLowerCase();
+  if(['input','textarea','select'].includes(tag)||event.target?.isContentEditable)return;
+  typed=(typed+event.key.toLowerCase()).slice(-8);
+  if(typed.endsWith('scraggy')){
+   typed='';
+   show('SCRAGGY SIGHTING','The mascot is watching your flight. It has no idea what a boarding pass is, but it is doing its best.');
+  }
+ });
+ const brand=document.querySelector('.topbar .brand');
+ if(brand){
+  brand.title=(brand.title?brand.title+' · ':'')+'Psst… Scraggy might know a secret.';
+ }
+ console.info('%cLupin Airlines%c — if you know, you know. Try the secret mascot, a certain classic button sequence, or typing “scraggy”.','font-weight:900;color:#111318;background:#d7ff3f;padding:4px','color:#69707d');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy();addScrollAnimations();addMotionInteractions();addEasterEggs()});
 })();
