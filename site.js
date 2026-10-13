@@ -220,6 +220,67 @@ function addEasterEggs(){
  if(brand){
   brand.title=(brand.title?brand.title+' · ':'')+'Psst… Scraggy might know a secret.';
  }
+
+ // Extra secrets: these are deliberately local, cosmetic, and never touch accounts or bookings.
+ let logoTaps=0,logoTapTimer;
+ const brandMark=document.querySelector('.topbar .brand');
+ if(brandMark){
+  brandMark.addEventListener('click',event=>{
+   logoTaps++;
+   clearTimeout(logoTapTimer);
+   logoTapTimer=setTimeout(()=>logoTaps=0,2200);
+   if(logoTaps>=7){
+    logoTaps=0;
+    event.preventDefault();
+    show('PLATFORM 9¾ BOARDING','Your platform is hidden behind a suspiciously ordinary wall. Please do not attempt to run at any actual walls. Hogwarts Express connection: delayed by 999 years.');
+   }
+  });
+ }
+ // Type these words anywhere outside a form to reveal different airline lore.
+ const secretWords={
+  'lupin':['FOUNDER MODE','Lupin Airlines was founded on one principle: if the route says “Somewhere”, that is legally enough.'],
+  'wrongwrong':['MDM WRONG-WRONG ALERT','A surprise inspection has been scheduled. Scraggy has mysteriously gone on annual leave.'],
+  'miles':['MILES? MILES!','Your miles are safe. This Easter egg does not change your account balance. Unlike a certain wizard, we do not duplicate money.'],
+  'hogwarts':['WIZARDING CONNECTION','The Hogwarts Express has requested Gate 9¾. Operations is still trying to fit the gate into the airport.'],
+  'creeper':['FLIGHT RISK DETECTED','A Creeper has been spotted near the runway. Please remain calm and do not hug the suspicious green passenger.']
+ };
+ let wordBuffer='';
+ document.addEventListener('keydown',event=>{
+  if(event.ctrlKey||event.metaKey||event.altKey||event.key.length!==1)return;
+  const tag=(event.target&&event.target.tagName||'').toLowerCase();
+  if(['input','textarea','select'].includes(tag)||event.target?.isContentEditable)return;
+  wordBuffer=(wordBuffer+event.key.toLowerCase()).slice(-16);
+  for(const [word,payload] of Object.entries(secretWords)){
+   if(wordBuffer.endsWith(word)){
+    wordBuffer='';
+    show(payload[0],payload[1]);
+    break;
+   }
+  }
+ });
+ // A secret route appears when the user double-clicks a flight card, but normal links remain untouched.
+ document.querySelectorAll('[data-flight],.flight-card,.flight-row,.route-card').forEach(card=>{
+  let taps=0,timer;
+  card.addEventListener('dblclick',()=>{
+   show('UNSCHEDULED DESTINATION','Congratulations. You found Flight LP 000½ to Somewhere Somehow. The aircraft is a minecart with elytra. Harry Potter has filed a complaint with the Department of Magical Transportation.');
+  });
+ });
+ // Footer copyright becomes a tiny dispatch console after five clicks.
+ const footer=document.querySelector('footer');
+ if(footer){
+  let clicks=0,timer;
+  footer.addEventListener('click',event=>{
+   if(event.target.closest('a,button,input,select,textarea'))return;
+   clicks++;
+   clearTimeout(timer);
+   timer=setTimeout(()=>clicks=0,1800);
+   if(clicks>=5){
+    clicks=0;
+    show('DISPATCH CONSOLE','All flights nominal. Scraggy is in charge of snacks. Mdm Wrong-Wrong is not allowed to touch the intercom.');
+   }
+  });
+ }
+
  console.info('%cLupin Airlines%c — if you know, you know. Try the secret mascot, a certain classic button sequence, or typing “scraggy”.','font-weight:900;color:#111318;background:#d7ff3f;padding:4px','color:#69707d');
 }
 
