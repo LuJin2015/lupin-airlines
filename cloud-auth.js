@@ -8,7 +8,7 @@
   const read=()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch{return null}};
   const shared=()=>{try{return JSON.parse(localStorage.getItem('lupinCloudAccount')||'null')}catch{return null}};
   const write=x=>{localStorage.setItem(SESSION_KEY,JSON.stringify(x));try{sessionStorage.setItem(SESSION_KEY,JSON.stringify(x))}catch{}};
-  const clear=(preserveShared=false)=>{localStorage.removeItem(SESSION_KEY);if(!preserveShared)localStorage.removeItem('lupinCloudAccount');window.dispatchEvent(new CustomEvent('lupin-auth-change',{detail:preserveShared?(shared()||null):null}));try{sessionStorage.removeItem(SESSION_KEY)}catch{}};
+  const clear=(preserveShared=false)=>{localStorage.removeItem(SESSION_KEY);if(!preserveShared){localStorage.removeItem('lupinCloudAccount');localStorage.removeItem('lupinCurrentUser')}window.dispatchEvent(new CustomEvent('lupin-auth-change',{detail:preserveShared?(shared()||null):null}));try{sessionStorage.removeItem(SESSION_KEY)}catch{}};
   async function api(path,options={}){
     const headers=Object.assign({'Content-Type':'application/json'},options.headers||{});
     const s=read(),cloud=shared(); if(s?.token) headers.Authorization='Bearer '+s.token; else if(cloud?.token) headers.Authorization='Bearer '+cloud.token;
@@ -26,6 +26,7 @@
     let data={};try{data=await response.json()}catch{}
     if(!response.ok){const e=new Error(data.error||'Lupin Cloud account error ('+response.status+').');e.status=response.status;throw e}
     localStorage.setItem('lupinCloudAccount',JSON.stringify({token:data.token,user:data.user,expiresAt:data.expiresAt}));
+    localStorage.setItem('lupinCurrentUser',JSON.stringify({id:data.user.id,username:data.user.username,createdAt:data.user.createdAt||null}));
     window.dispatchEvent(new CustomEvent('lupin-auth-change',{detail:{token:data.token,user:data.user,expiresAt:data.expiresAt}}));
     return data;
   }
