@@ -68,5 +68,13 @@
   async function cancel(id){return api('/bookings/'+encodeURIComponent(id)+'/cancel',{method:'POST'})}
   async function flights(){return (await api('/flights')).flights||[]}
   async function seatMap(flight,date){return api('/seats?flight='+encodeURIComponent(flight)+'&date='+encodeURIComponent(date))}
+  // A sign-out in any sibling Lupin app must also invalidate the airline's local session.
+  window.addEventListener('storage',event=>{
+    if(event.key!=='lupinCloudAccount'&&event.key!=='lupinCurrentUser')return;
+    const cloud=shared(),session=read();
+    if(!cloud?.token){clear(false);return}
+    if(session?.cloudUser?.id&&cloud.user?.id&&session.cloudUser.id!==cloud.user.id){clear(true);return}
+    window.dispatchEvent(new CustomEvent('lupin-auth-change',{detail:cloud}));
+  });
   window.LUPIN_CLOUD={apiBase:API_BASE,airline:AIRLINE,api,current:()=>read()?.username||'',session:read,logout:clear,register,login,account,bookings,book,cancel,flights,seatMap};
 })();
