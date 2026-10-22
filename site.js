@@ -44,7 +44,7 @@ function renderBar(){
 async function renderNotice(){
  let p={...(C.notice||{})};
  try{
-  const endpoint=(C.cloud?.apiBase||'https://lupin-data-api.lujinsg.workers.dev').replace(/\\/$/,'')+'/api/lupin-airlines/site-notice';
+  const endpoint=String(C.cloud?.apiBase||'https://lupin-data-api.lujinsg.workers.dev').replace(/\/$/,'')+'/api/lupin-airlines/site-notice';
   const response=await fetch(endpoint,{cache:'no-store'});
   if(response.ok){const data=await response.json();if(data&&data.notice)p={...p,...data.notice}}
  }catch(_){}
