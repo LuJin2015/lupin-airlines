@@ -13,5 +13,5 @@ window.LUPIN_CONFIG={
   account:{label:'Account',href:'account/',icon:'👤'},
   cta:{label:'Book now',href:'booking/',enabled:true}
  },
- privacyBanner:{enabled:true,title:'Cloud data update',text:'Lupin Airlines accounts, Lupin Miles, and bookings are stored in the shared GitHub cloud repository.',linkText:'Learn more',href:'about/'}
+ notice:{enabled:true,title:'Affiliation notice',text:'A separate website using the name “Lupin Air” is not part of the Lupin ecosystem and is not affiliated with or endorsed by Lupin Airlines.',linkText:'',href:''}
 };
