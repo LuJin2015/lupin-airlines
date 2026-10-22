@@ -9,7 +9,7 @@ function addChromeStyles(){
  if(document.getElementById('lupin-chrome-styles'))return;
  const s=document.createElement('style');
  s.id='lupin-chrome-styles';
- s.textContent='.privacy-banner{display:flex;align-items:center;gap:14px;padding:10px 4vw;background:#111318;color:#fff;font:11px/1.4 system-ui,sans-serif}.privacy-banner strong{color:#d7ff3f;white-space:nowrap}.privacy-banner span{color:#d5d8de}.privacy-banner a{color:#fff;font-weight:800;white-space:nowrap}.topbar nav{display:flex;align-items:center;gap:18px;flex:1;flex-wrap:wrap}.topbar nav a{white-space:nowrap}.topbar nav a.active{font-weight:900;text-decoration:underline;text-underline-offset:5px}.topbar .brand{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}.topbar .nav-button{white-space:nowrap;text-decoration:none}.topbar .account-button{min-width:38px;text-align:center;padding:10px 12px}.topbar .logo{width:30px;height:30px;object-fit:contain;border-radius:50%}@media(max-width:900px){.privacy-banner{align-items:flex-start;flex-wrap:wrap;padding:10px 5vw}.privacy-banner span{flex:1;min-width:220px}.topbar nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.topbar nav a{font-size:13px}.topbar .nav-button{font-size:13px}}';
+ s.textContent='.site-notice{display:flex;align-items:center;gap:14px;padding:12px 4vw;background:#f2f3f5;color:#252833;border-bottom:1px solid #dfe1e6;font:13px/1.5 system-ui,sans-serif}.site-notice strong{color:#252833;white-space:nowrap}.site-notice span{color:#343844}.site-notice a{color:#252833;font-weight:800;white-space:nowrap}.topbar nav{display:flex;align-items:center;gap:18px;flex:1;flex-wrap:wrap}.topbar nav a{white-space:nowrap}.topbar nav a.active{font-weight:900;text-decoration:underline;text-underline-offset:5px}.topbar .brand{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}.topbar .nav-button{white-space:nowrap;text-decoration:none}.topbar .account-button{min-width:38px;text-align:center;padding:10px 12px}.topbar .logo{width:30px;height:30px;object-fit:contain;border-radius:50%}@media(max-width:900px){.site-notice{align-items:flex-start;flex-wrap:wrap;padding:10px 5vw}.site-notice span{flex:1;min-width:220px}.topbar nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.topbar nav a{font-size:13px}.topbar .nav-button{font-size:13px}}';
  document.head.appendChild(s)
 }
 function renderBar(){
@@ -41,11 +41,17 @@ function renderBar(){
  const cta=C.topbar?.cta;
  if(cta?.enabled){const a=make('a',{class:'nav-button',href:url(cta.href)});a.textContent=cta.label||'Book now';old.append(a)}
 }
-function renderPrivacy(){
- const p=C.privacyBanner;
- if(!p?.enabled||document.querySelector('.privacy-banner'))return;
- const bar=make('div',{class:'privacy-banner'});
- bar.append(make('strong',{},p.title||''),make('span',{},p.text||''));
+async function renderNotice(){
+ let p={...(C.notice||{})};
+ try{
+  const endpoint=(C.cloud?.apiBase||'https://lupin-data-api.lujinsg.workers.dev').replace(/\\/$/,'')+'/api/lupin-airlines/site-notice';
+  const response=await fetch(endpoint,{cache:'no-store'});
+  if(response.ok){const data=await response.json();if(data&&data.notice)p={...p,...data.notice}}
+ }catch(_){}
+ document.querySelectorAll('.privacy-banner,.site-notice').forEach(el=>el.remove());
+ if(p.enabled===false||!p.text)return;
+ const bar=make('div',{class:'site-notice',role:'note'});
+ bar.append(make('strong',{},p.title||'Notice'),make('span',{},p.text||''));
  if(p.href)bar.append(make('a',{href:url(p.href)},p.linkText||'Learn more'));
  document.body.prepend(bar)
 }
@@ -284,5 +290,5 @@ function addEasterEggs(){
  console.info('%cLupin Airlines%c — if you know, you know. Try the secret mascot, a certain classic button sequence, or typing “scraggy”.','font-weight:900;color:#111318;background:#d7ff3f;padding:4px','color:#69707d');
 }
 
-document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderPrivacy();addScrollAnimations();addMotionInteractions();addEasterEggs()});
+document.addEventListener('DOMContentLoaded',()=>{addChromeStyles();renderBar();renderNotice();addScrollAnimations();addMotionInteractions();addEasterEggs()});
 })();
